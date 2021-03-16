@@ -1,11 +1,11 @@
 ---
-page_title: "scaffolding Provider"
+page_title: "vercel Provider"
 subcategory: ""
 description: |-
   
 ---
 
-# scaffolding Provider
+# vercel Provider
 
 
 
@@ -18,3 +18,7 @@ provider "scaffolding" {
 ```
 
 ## Schema
+
+### Required
+
+- **token** (String, Sensitive)

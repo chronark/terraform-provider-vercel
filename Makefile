@@ -13,10 +13,11 @@ build: fmt
 
 
 fmt:
+
 	go generate -v ./...
 	golangci-lint run -v
 	go fmt ./...
-
+	terraform fmt -recursive .
 
 rm-state:
 	rm -rf examples/e2e/terraform.tfstate*

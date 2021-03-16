@@ -1,0 +1,36 @@
+---
+page_title: "vercel_user Data Source - terraform-provider-vercel"
+subcategory: ""
+description: |-
+  Retrieves information related to the authenticated user. https://vercel.com/docs/api#endpoints/user/get-the-authenticated-user
+---
+
+# Data Source `vercel_user`
+
+Retrieves information related to the authenticated user. https://vercel.com/docs/api#endpoints/user/get-the-authenticated-user
+
+
+
+## Schema
+
+### Read-only
+
+- **avatar** (String)
+- **bio** (String)
+- **email** (String)
+- **id** (String) The ID of this resource.
+- **name** (String)
+- **platformversion** (Number)
+- **profiles** (List of Object) (see [below for nested schema](#nestedatt--profiles))
+- **username** (String)
+- **website** (String)
+
+<a id="nestedatt--profiles"></a>
+### Nested Schema for `profiles`
+
+Read-only:
+
+- **link** (String)
+- **service** (String)
+
+

@@ -2,8 +2,7 @@ package provider
 
 import (
 	"context"
-
-	"github.com/chronark/terraform-plugin-vercel/internal/vercel"
+	"fmt"
 	"github.com/chronark/terraform-provider-vercel/internal/vercel"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -28,8 +27,16 @@ func init() {
 func New(version string) func() *schema.Provider {
 	return func() *schema.Provider {
 		p := &schema.Provider{
+			Schema: map[string]*schema.Schema{
+				"token": {
+					Type:        schema.TypeString,
+					Required:    true,
+					Sensitive:   true,
+					DefaultFunc: schema.EnvDefaultFunc("VERCEL_TOKEN", nil),
+				},
+			},
 			DataSourcesMap: map[string]*schema.Resource{
-				"scaffolding_data_source": dataSourceScaffolding(),
+				"vercel_user": dataSourceUser(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
 				"scaffolding_resource": resourceScaffolding(),
@@ -42,11 +49,17 @@ func New(version string) func() *schema.Provider {
 	}
 }
 
-
 func configure(version string, p *schema.Provider) func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	return func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
-		client := vercel.New()
+	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+		var diags diag.Diagnostics
+		token := d.Get("token").(string)
 
-		return client, nil
+		if token == "" {
+			return nil, diag.FromErr(fmt.Errorf("vercel token is not set"))
+		}
+
+		client := vercel.New(token)
+
+		return client, diags
 	}
 }

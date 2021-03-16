@@ -6,40 +6,38 @@ import (
 	"net/http"
 )
 
-
-
-
 type Client struct {
-	url string
+	url        string
 	httpClient *http.Client
-	userAgent string
+	userAgent  string
+	token      string
 }
 
-
-func New() *Client {
+func New(token string) *Client {
 	return &Client{
-		url: "https://api.vercel.com",
+		url:        "https://api.vercel.com",
 		httpClient: &http.Client{},
-		userAgent: "chronark/terraform-provider-vercel",
+		userAgent:  "chronark/terraform-provider-vercel",
+		token:      token,
 	}
 }
-
 
 // https://vercel.com/docs/api#api-basics/errors
 type VercelError struct {
 	Error struct {
-		Code string `json:"code"`
+		Code    string `json:"code"`
 		Message string `json:"message"`
 	} `json:"error"`
 }
 
-func (c *Client) Call(method string, path string)(*http.Response, error) {
+func (c *Client) Call(method string, path string) (*http.Response, error) {
 	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", c.url, path), nil)
-	req.Header.Set("User-Agent", c.userAgent)
-	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.token))
 	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
