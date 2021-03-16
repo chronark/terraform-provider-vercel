@@ -113,12 +113,12 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	
+
 	err = d.Set("name", decodedResponse.User.Name)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	
+
 	err = d.Set("username", decodedResponse.User.Username)
 	if err != nil {
 		return diag.FromErr(err)
