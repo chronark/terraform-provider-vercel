@@ -1,7 +1,7 @@
 # Endpoints
 
-- [ ] User
-    - [ ] Get the authenticated user
+- [x] User
+    - [x] Get the authenticated user
 - [ ] Deployments
     - [ ] Create a New Deployment
     - [ ] Upload Deployment Files
