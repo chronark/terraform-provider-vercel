@@ -2,12 +2,12 @@
 page_title: "vercel_project Resource - terraform-provider-vercel"
 subcategory: ""
 description: |-
-  Sample resource in the Terraform provider scaffolding.
+  https://vercel.com/docs/api#endpoints/projects
 ---
 
 # Resource `vercel_project`
 
-Sample resource in the Terraform provider scaffolding.
+https://vercel.com/docs/api#endpoints/projects
 
 ## Example Usage
 
