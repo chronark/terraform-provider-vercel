@@ -12,7 +12,7 @@ import (
 
 func resourceProject() *schema.Resource {
 	return &schema.Resource{
-		Description: "Sample resource in the Terraform provider scaffolding.",
+		Description: "https://vercel.com/docs/api#endpoints/projects",
 
 		CreateContext: resourceProjectCreate,
 		ReadContext:   resourceProjectRead,
