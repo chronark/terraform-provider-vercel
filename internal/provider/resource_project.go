@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"log"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
@@ -20,6 +19,11 @@ func resourceProject() *schema.Resource {
 		DeleteContext: resourceProjectDelete,
 
 		Schema: map[string]*schema.Schema{
+			"id": {
+				Description: "Internal id of this project",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"name": {
 				Description: "The name of the project.",
 				Type:        schema.TypeString,
@@ -139,6 +143,7 @@ func resourceProject() *schema.Resource {
 				Description: "The region to deploy Serverless Functions in this project.",
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 			},
 			"root_directory": {
 				Description: "The name of a directory or relative path to the source code of your project. When null is used it will default to the project root.",
@@ -149,6 +154,7 @@ func resourceProject() *schema.Resource {
 				Description: "The Node.js Version for this project.",
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
@@ -181,6 +187,7 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	d.SetId(id)
 
 	return resourceProjectRead(ctx, d, meta)
@@ -261,6 +268,7 @@ func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta int
 
 	client := meta.(*vercel.Client)
 	var update project.UpdateProject
+
 	if d.HasChange("name") {
 		update.Name = d.Get("name").(string)
 	}
@@ -303,7 +311,6 @@ func resourceProjectDelete(ctx context.Context, d *schema.ResourceData, meta int
 	client := meta.(*vercel.Client)
 	err := client.Project.Delete(d.Id())
 	if err != nil {
-		log.Println("THE ERROR WAS HERE1")
 		return diag.FromErr(err)
 	}
 	return diag.Diagnostics{}

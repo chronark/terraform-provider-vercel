@@ -13,8 +13,8 @@ on:
   # we recommend testing at a regular interval not necessarily tied to code changes. This will 
   # ensure you are alerted to something breaking due to an API change, even if the code did not
   # change.
-  # schedule:
-  #   - cron: '0 13 * * *'
+  schedule:
+    - cron: '0 23 * * *'
 jobs:
   # ensure the code builds...
   build:
@@ -74,7 +74,7 @@ jobs:
       env:
         TF_ACC: "1"
         TF_ACC_TERRAFORM_VERSION: ${{ matrix.terraform }}
-
+        VERCEL_TOKEN: ${{secret.VERCEL_TOKEN}}
         # Set whatever additional acceptance test env vars here. You can
         # optionally use data from your repository secrets using the
         # following syntax:

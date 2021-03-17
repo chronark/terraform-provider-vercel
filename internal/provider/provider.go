@@ -52,7 +52,6 @@ func New(version string) func() *schema.Provider {
 
 func configure(version string, p *schema.Provider) func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-		var diags diag.Diagnostics
 		token := d.Get("token").(string)
 
 		if token == "" {
@@ -61,6 +60,6 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 
 		client := vercel.New(token)
 
-		return client, diags
+		return client, diag.Diagnostics{}
 	}
 }
