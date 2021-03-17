@@ -2,9 +2,8 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 
-	"github.com/chronark/terraform-provider-vercel/internal/vercel"
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -68,87 +67,54 @@ func dataSourceUser() *schema.Resource {
 	}
 }
 
-type response struct {
-	User struct {
-		UID             string `json:"uid"`
-		Email           string `json:"email"`
-		Name            string `json:"name"`
-		Username        string `json:"username"`
-		Avatar          string `json:"avatar"`
-		PlatformVersion int    `json:"platformVersion"`
-		Billing         struct {
-			Plan        string      `json:"plan"`
-			Period      interface{} `json:"period"`
-			Trial       interface{} `json:"trial"`
-			Cancelation interface{} `json:"cancelation"`
-			Addons      interface{} `json:"addons"`
-		} `json:"billing"`
-		Bio      string `json:"bio"`
-		Website  string `json:"website"`
-		Profiles []struct {
-			Service string `json:"service"`
-			Link    string `json:"link"`
-		} `json:"profiles"`
-	} `json:"user"`
-}
-
 func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
 
 	client := meta.(*vercel.Client)
 
-	res, err := client.Call("GET", "/www/user")
+	user, err := client.User.Read()
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	defer res.Body.Close()
-
-	var decodedResponse response
-	err = json.NewDecoder(res.Body).Decode(&decodedResponse)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	err = d.Set("email", decodedResponse.User.Email)
+	err = d.Set("email", user.Email)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("name", decodedResponse.User.Name)
+	err = d.Set("name", user.Name)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("username", decodedResponse.User.Username)
+	err = d.Set("username", user.Username)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("avatar", decodedResponse.User.Avatar)
+	err = d.Set("avatar", user.Avatar)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("platformversion", decodedResponse.User.PlatformVersion)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	err = d.Set("bio", decodedResponse.User.Bio)
+	err = d.Set("platformversion", user.PlatformVersion)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("website", decodedResponse.User.Website)
+	err = d.Set("bio", user.Bio)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	err = d.Set("profiles", decodedResponse.User.Profiles)
+	err = d.Set("website", user.Website)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.SetId(decodedResponse.User.UID)
+	err = d.Set("profiles", user.Profiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	return diags
+	d.SetId(user.UID)
+
+	return diag.Diagnostics{}
 }

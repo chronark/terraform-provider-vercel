@@ -11,6 +11,14 @@ provider "vercel" {
   token = "wsByP9ptGqn7snGvvY00aDzn"
 }
 
+data "vercel_user" "me" {}
 
+resource "vercel_project" "my_project" {
+  name = "mercury-via-terraform"
+  git_repository {
+    type = "github"
+    repo = "chronark/mercury"
+  }
 
-data "vercel_user" "user" {}
+  framework = "nextjs"
+}

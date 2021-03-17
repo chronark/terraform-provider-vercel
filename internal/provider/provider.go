@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/chronark/terraform-provider-vercel/internal/vercel"
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -39,6 +39,7 @@ func New(version string) func() *schema.Provider {
 				"vercel_user": dataSourceUser(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
+				"vercel_project":       resourceProject(),
 				"scaffolding_resource": resourceScaffolding(),
 			},
 		}
