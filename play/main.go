@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
-
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
+	"log"
+	"os"
 )
 
 func main() {
-	client := vercel.New("wsByP9ptGqn7snGvvY00aDzn")
+	client := vercel.New(os.Getenv("VERCEL_TOKEN"))
 
 	err := client.Project.Delete("prj_1iprv60UGpVPyukGUp3NAJN8K4VR")
 	if err != nil {
