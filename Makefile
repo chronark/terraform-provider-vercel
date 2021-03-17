@@ -31,4 +31,7 @@ apply:
 
 
 release:
-	git tag $$(svu next) && git push --tags
+	@echo "Releasing $$(svu next)..."
+	
+	@git tag $$(svu next) && git push --tags
+	@echo "Done"
