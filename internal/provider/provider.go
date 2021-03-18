@@ -42,6 +42,7 @@ func New(version string) func() *schema.Provider {
 			ResourcesMap: map[string]*schema.Resource{
 				"vercel_env":     resourceEnv(),
 				"vercel_project": resourceProject(),
+				"vercel_secret":  resourceSecret(),
 			},
 		}
 

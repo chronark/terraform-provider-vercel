@@ -26,8 +26,13 @@ resource "vercel_project" "my_project" {
 
 resource "vercel_env" "env" {
   project_id = vercel_project.my_project.id
-  type       = "plain"
+  type       = "secret"
   key        = "key"
-  value      = "value"
+  value      = vercel_secret.my_secret.id
   target     = ["production", "preview", "development"]
+}
+
+resource "vercel_secret" "my_secret" {
+  name  = "my_secret"
+  value = "super secret"
 }
