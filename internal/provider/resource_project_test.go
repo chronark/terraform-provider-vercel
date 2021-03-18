@@ -31,29 +31,6 @@ func TestAccVercelProjectBasic(t *testing.T) {
 	})
 }
 
-func TestAccVercelProjectWithEnv(t *testing.T) {
-	projectName, _ := uuid.GenerateUUID()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCheckVercelProjectConfigWithEnv(projectName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVercelProjectExists("vercel_project.with_env"),
-					resource.TestCheckResourceAttr(
-						"vercel_project.with_env", "name", projectName,
-					),
-					resource.TestCheckResourceAttr(
-						"vercel_project.with_env", "env", projectName,
-					),
-				),
-			},
-		},
-	})
-}
 
 func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
@@ -87,22 +64,6 @@ func testAccCheckVercelProjectConfigBasic(name string) string {
 	`, name)
 }
 
-func testAccCheckVercelProjectConfigWithEnv(name string) string {
-	return fmt.Sprintf(`
-	resource "vercel_project" "with_env" {
-		name = "%s"
-		git_repository {
-			type = "github"
-			repo = "chronark/mercury"
-		}
-		env {
-			type = "public"
-			key = "hello"
-			value = "world"
-		}
-	}
-	`, name)
-}
 
 func testAccCheckVercelProjectExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
