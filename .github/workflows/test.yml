@@ -100,4 +100,4 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - run: exit 0
+      - run: echo Success!
