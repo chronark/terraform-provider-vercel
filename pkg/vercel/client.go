@@ -1,6 +1,7 @@
 package vercel
 
 import (
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/httpApi"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
@@ -10,6 +11,7 @@ import (
 type Client struct {
 	Project *project.ProjectHandler
 	User    *user.UserHandler
+	Env     *env.Handler
 }
 
 func New(token string) *Client {
@@ -22,5 +24,6 @@ func New(token string) *Client {
 		User: &user.UserHandler{
 			Api: api,
 		},
+		Env: &env.Handler{Api: api},
 	}
 }

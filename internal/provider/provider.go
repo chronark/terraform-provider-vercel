@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -39,8 +40,8 @@ func New(version string) func() *schema.Provider {
 				"vercel_user": dataSourceUser(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"vercel_project":       resourceProject(),
-				"scaffolding_resource": resourceScaffolding(),
+				"vercel_env":     resourceEnv(),
+				"vercel_project": resourceProject(),
 			},
 		}
 
@@ -55,7 +56,7 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		token := d.Get("token").(string)
 
 		if token == "" {
-			return nil, diag.FromErr(fmt.Errorf("vercel token is not set"))
+			return nil, diag.FromErr(fmt.Errorf("vercel token is not set, set manually or via `VERCEL_TOKEN` "))
 		}
 
 		client := vercel.New(token)

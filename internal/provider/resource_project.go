@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -64,49 +63,6 @@ func resourceProject() *schema.Resource {
 				Description: "A number containing the date when the project was updated in milliseconds.",
 				Type:        schema.TypeInt,
 				Computed:    true,
-			},
-			"env": {
-				Description: "A list of environment variables configured for the project.",
-				Type:        schema.TypeList,
-				Optional:    true,
-				Computed:    true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"type": {
-							Description: "`secret` or `public`",
-							Type:        schema.TypeString,
-							Computed:    true,
-							Optional:    true,
-						},
-						"id": {
-							Description: "Unique id for this variable.",
-							Type:        schema.TypeString,
-							Computed:    true,
-						},
-						"key": {
-							Description: "The name of this variable",
-							Type:        schema.TypeString,
-							Computed:    true,
-							Optional:    true,
-						},
-						"value": {
-							Description: "The value of this variable.",
-							Type:        schema.TypeString,
-							Computed:    true,
-							Optional:    true,
-						},
-						"created_at": {
-							Description: "A number containing the date when the variable was created in milliseconds.",
-							Type:        schema.TypeInt,
-							Computed:    true,
-						},
-						"updated_at": {
-							Description: "A number containing the date when the variable was updated in milliseconds.",
-							Type:        schema.TypeInt,
-							Computed:    true,
-						},
-					},
-				},
 			},
 			"framework": {
 				Description: "The framework that is being used for this project. When null is used no framework is selected.",
@@ -177,8 +133,8 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 		},
 	}
 
-	framework, isSet := d.GetOk("framework")
-	if isSet {
+	framework, frameWorkSet := d.GetOk("framework")
+	if frameWorkSet {
 		project.Framework = framework.(string)
 	}
 
@@ -219,10 +175,7 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("env", project.Env)
-	if err != nil {
-		return diag.FromErr(err)
-	}
+
 	err = d.Set("framework", project.Framework)
 	if err != nil {
 		return diag.FromErr(err)
@@ -299,10 +252,12 @@ func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta int
 	if d.HasChange("node_version") {
 		update.NodeVersion = d.Get("node_version").(string)
 	}
+
 	err := client.Project.Update(d.Id(), update)
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	return resourceProjectRead(ctx, d, meta)
 }
 

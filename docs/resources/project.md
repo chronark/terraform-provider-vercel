@@ -19,6 +19,8 @@ resource "vercel_project" "my_project" {
     type = "github"
     repo = "chronark/mercury"
   }
+
+
 }
 ```
 
@@ -34,7 +36,6 @@ resource "vercel_project" "my_project" {
 
 - **build_command** (String) The build command for this project. When null is used this value will be automatically detected.
 - **dev_command** (String) The dev command for this project. When null is used this value will be automatically detected.
-- **env** (Block List) A list of environment variables configured for the project. (see [below for nested schema](#nestedblock--env))
 - **framework** (String) The framework that is being used for this project. When null is used no framework is selected.
 - **install_command** (String) The install command for this project. When null is used this value will be automatically detected.
 - **node_version** (String) The Node.js Version for this project.
@@ -57,21 +58,5 @@ Required:
 
 - **repo** (String) The name of the Git Repository.
 - **type** (String) The Git Provider of the repository. Must be either `github`, `gitlab`, or `bitbucket`.
-
-
-<a id="nestedblock--env"></a>
-### Nested Schema for `env`
-
-Optional:
-
-- **key** (String) The name of this variable
-- **type** (String) `secret` or `public`
-- **value** (String) The value of this variable.
-
-Read-Only:
-
-- **created_at** (Number) A number containing the date when the variable was created in milliseconds.
-- **id** (String) Unique id for this variable.
-- **updated_at** (Number) A number containing the date when the variable was updated in milliseconds.
 
 

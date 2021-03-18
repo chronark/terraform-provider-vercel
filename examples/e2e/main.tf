@@ -20,5 +20,14 @@ resource "vercel_project" "my_project" {
     repo = "chronark/mercury"
   }
 
-  framework = "nextjs"
+
+
+}
+
+resource "vercel_env" "env" {
+  project_id = vercel_project.my_project.id
+  type       = "plain"
+  key        = "key"
+  value      = "value"
+  target     = ["production", "preview", "development"]
 }

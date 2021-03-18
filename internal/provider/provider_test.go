@@ -16,7 +16,7 @@ var providerFactories = map[string]func() (*schema.Provider, error){
 
 func TestProvider(t *testing.T) {
 	if err := New("dev")().InternalValidate(); err != nil {
-		t.Fatalf("err: %s", err)
+		t.Fatalf("Unable to create new provider: %s", err)
 	}
 }
 

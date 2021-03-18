@@ -5,4 +5,6 @@ resource "vercel_project" "my_project" {
     type = "github"
     repo = "chronark/mercury"
   }
+
+
 }

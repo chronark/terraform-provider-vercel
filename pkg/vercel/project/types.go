@@ -1,5 +1,7 @@
 package project
 
+import "github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
+
 // Project houses all the information vercel offers about a project via their api
 type Project struct {
 	AccountID string `json:"accountId"`
@@ -57,34 +59,23 @@ type Project struct {
 		DisabledAt int64  `json:"disabledAt"`
 		CanceledAt int64  `json:"canceledAt"`
 	} `json:"analytics"`
-	AutoExposeSystemEnvs bool        `json:"autoExposeSystemEnvs"`
-	BuildCommand         interface{} `json:"buildCommand"`
-	CreatedAt            int64       `json:"createdAt"`
-	DevCommand           interface{} `json:"devCommand"`
-	DirectoryListing     bool        `json:"directoryListing"`
-	Env                  []struct {
-		Type            string      `json:"type"`
-		Value           string      `json:"value"`
-		Target          []string    `json:"target"`
-		ConfigurationID string      `json:"configurationId"`
-		ID              string      `json:"id"`
-		Key             string      `json:"key"`
-		CreatedAt       int64       `json:"createdAt"`
-		UpdatedAt       int64       `json:"updatedAt"`
-		CreatedBy       string      `json:"createdBy"`
-		UpdatedBy       interface{} `json:"updatedBy"`
-	} `json:"env"`
-	Framework                       string `json:"framework"`
-	ID                              string `json:"id"`
-	InstallCommand                  string `json:"installCommand"`
-	Name                            string `json:"name"`
-	NodeVersion                     string `json:"nodeVersion"`
-	OutputDirectory                 string `json:"outputDirectory"`
-	PublicSource                    bool   `json:"publicSource"`
-	RootDirectory                   string `json:"rootDirectory"`
-	ServerlessFunctionRegion        string `json:"serverlessFunctionRegion"`
-	SourceFilesOutsideRootDirectory bool   `json:"sourceFilesOutsideRootDirectory"`
-	UpdatedAt                       int64  `json:"updatedAt"`
+	AutoExposeSystemEnvs            bool        `json:"autoExposeSystemEnvs"`
+	BuildCommand                    interface{} `json:"buildCommand"`
+	CreatedAt                       int64       `json:"createdAt"`
+	DevCommand                      interface{} `json:"devCommand"`
+	DirectoryListing                bool        `json:"directoryListing"`
+	Env                             []env.Env   `json:"env"`
+	Framework                       string      `json:"framework"`
+	ID                              string      `json:"id"`
+	InstallCommand                  string      `json:"installCommand"`
+	Name                            string      `json:"name"`
+	NodeVersion                     string      `json:"nodeVersion"`
+	OutputDirectory                 string      `json:"outputDirectory"`
+	PublicSource                    bool        `json:"publicSource"`
+	RootDirectory                   string      `json:"rootDirectory"`
+	ServerlessFunctionRegion        string      `json:"serverlessFunctionRegion"`
+	SourceFilesOutsideRootDirectory bool        `json:"sourceFilesOutsideRootDirectory"`
+	UpdatedAt                       int64       `json:"updatedAt"`
 	Link                            struct {
 		Type             string        `json:"type"`
 		Repo             string        `json:"repo"`
