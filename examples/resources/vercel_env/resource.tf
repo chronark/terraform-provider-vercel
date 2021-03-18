@@ -1,11 +1,6 @@
 
-// This is optional and only useful to reference a project id.
 resource "vercel_project" "my_project" {
-  name = "mercury-via-terraform"
-  git_repository {
-    type = "github"
-    repo = "chronark/mercury"
-  }
+  // ...
 }
 
 resource "vercel_env" "my_env" {
