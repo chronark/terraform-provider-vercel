@@ -13,13 +13,8 @@ https://vercel.com/docs/api#endpoints/projects/get-project-environment-variables
 ## Example Usage
 
 ```terraform
-// This is optional and only useful to reference a project id.
 resource "vercel_project" "my_project" {
-  name = "mercury-via-terraform"
-  git_repository {
-    type = "github"
-    repo = "chronark/mercury"
-  }
+  // ...
 }
 
 resource "vercel_env" "my_env" {

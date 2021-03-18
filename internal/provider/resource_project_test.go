@@ -31,7 +31,6 @@ func TestAccVercelProjectBasic(t *testing.T) {
 	})
 }
 
-
 func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := vercel.New(os.Getenv("VERCEL_TOKEN"))
@@ -63,7 +62,6 @@ func testAccCheckVercelProjectConfigBasic(name string) string {
 	}
 	`, name)
 }
-
 
 func testAccCheckVercelProjectExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
