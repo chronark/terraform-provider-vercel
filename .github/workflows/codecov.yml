@@ -1,0 +1,34 @@
+name: Report coverage
+
+on:
+  push:
+    branches: [ main ]
+
+
+jobs:
+  collect-coverage:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: go mod download
+
+    - name: Test
+      run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+      env:
+        TF_ACC: "1"
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+
+    - name: Run codecov coverage reporter
+      run: bash <(curl -s https://codecov.io/bash)
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
