@@ -93,3 +93,11 @@ jobs:
     
         run: |
           go test -v ./...
+
+  # Get a single check for the branch protection rules.
+  tests_ok:
+    name: Tests OK
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 0
