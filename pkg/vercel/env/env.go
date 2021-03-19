@@ -3,8 +3,10 @@ package env
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/chronark/terraform-provider-vercel/pkg/vercel/httpApi"
 	"log"
+	"net/http"
+
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel/httpApi"
 )
 
 type CreateOrUpdateEnv struct {
@@ -35,11 +37,11 @@ type Env struct {
 }
 
 type Handler struct {
-	Api *httpApi.Api
+	Api httpApi.API
 }
 
 func (h *Handler) Create(projectID string, env CreateOrUpdateEnv) (string, error) {
-	res, err := h.Api.Post(fmt.Sprintf("/v6/projects/%s/env", projectID), env)
+	res, err := h.Api.Request(http.MethodPost, fmt.Sprintf("/v6/projects/%s/env", projectID), env)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +59,7 @@ func (h *Handler) Create(projectID string, env CreateOrUpdateEnv) (string, error
 
 // Read returns environment variables associated with a project
 func (h *Handler) Read(projectID string) (envs []Env, err error) {
-	res, err := h.Api.Get(fmt.Sprintf("/v6/projects/%s/env", projectID))
+	res, err := h.Api.Request("GET", fmt.Sprintf("/v6/projects/%s/env", projectID), nil)
 	if err != nil {
 		return []Env{}, fmt.Errorf("Unable to fetch environment variables from vercel: %w", err)
 	}
@@ -79,7 +81,7 @@ func (h *Handler) Read(projectID string) (envs []Env, err error) {
 	return envResponse.Envs, nil
 }
 func (h *Handler) Update(projectID string, envID string, env CreateOrUpdateEnv) error {
-	res, err := h.Api.Patch(fmt.Sprintf("/v6/projects/%s/env/%s", projectID, envID), env)
+	res, err := h.Api.Request("PATCH",fmt.Sprintf("/v6/projects/%s/env/%s", projectID, envID), env)
 	if err != nil {
 		return fmt.Errorf("Unable to update env: %w", err)
 	}
@@ -87,7 +89,7 @@ func (h *Handler) Update(projectID string, envID string, env CreateOrUpdateEnv) 
 	return nil
 }
 func (h *Handler) Delete(projectID, envKey string) error {
-	res, err := h.Api.Delete(fmt.Sprintf("/v4/projects/%s/env/%s", projectID, envKey))
+	res, err := h.Api.Request("DELETE",fmt.Sprintf("/v4/projects/%s/env/%s", projectID, envKey),nil)
 	if err != nil {
 		return fmt.Errorf("Unable to delete env: %w", err)
 	}

@@ -4,8 +4,10 @@ default: testacc
 .PHONY: testacc
 testacc:
 	@# go get github.com/mfridman/tparse
-	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m -json -race -covermode=atomic | tparse -all -noborders -pulse 1s
+	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m  -race -covermode=atomic  -json | tparse -all -dump
 
+test:
+	go test ./... -v
 
 build: fmt
 	go build -o terraform-provider-vercel

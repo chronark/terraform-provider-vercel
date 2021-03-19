@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -10,27 +11,91 @@ import (
 	"testing"
 )
 
-func TestAccVercelProjectBasic(t *testing.T) {
+func TestAccVercelProject(t *testing.T) {
 
 	projectName, _ := uuid.GenerateUUID()
+	updatedProjectName, _ := uuid.GenerateUUID()
+	var (
 
+		// Holds the project fetched from vercel when we create it at the beginning
+		actualProjectAfterCreation project.Project
+
+		// Renaming or changing a variable should not result in the recreation of the project, so we expect to have the same id.
+		actualProjectAfterUpdate project.Project
+	)
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckVercelProjectDestroy(projectName),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckVercelProjectConfigBasic(projectName),
+				Config: testAccCheckVercelProjectConfig(projectName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVercelProjectExists("vercel_project.new"),
-					resource.TestCheckResourceAttr(
-						"vercel_project.new", "name", projectName),
+					testAccCheckProjectStateHasValues(
+						"vercel_project.new", project.Project{Name: projectName},
+					),
+					testAccCheckVercelProjectExists("vercel_project.new", &actualProjectAfterCreation),
+					testAccCheckActualProjectHasValues(&actualProjectAfterCreation, &project.Project{Name: projectName}),
+				),
+			},
+			{
+				Config: testAccCheckVercelProjectConfig(updatedProjectName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVercelProjectExists("vercel_project.new", &actualProjectAfterUpdate),
+					testAccCheckProjectStateHasValues(
+						"vercel_project.new", project.Project{Name: updatedProjectName},
+					),
+					testAccCheckActualProjectHasValues(&actualProjectAfterUpdate, &project.Project{Name: updatedProjectName}),
+					testAccCheckProjectWasNotRecreated(&actualProjectAfterCreation, &actualProjectAfterUpdate),
 				),
 			},
 		},
 	})
 }
 
+// Combines multiple `resource.TestCheckResourceAttr` calls
+func testAccCheckProjectStateHasValues(name string, want project.Project) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		tests := []resource.TestCheckFunc{
+			resource.TestCheckResourceAttr(
+				name, "name", want.Name),
+		}
+
+		for _, test := range tests {
+			err := test(s)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+// Chaning the name or value of a project should not result in a recreation meaning the UID assigned by vercel
+// should not have changed.
+func testAccCheckProjectWasNotRecreated(s1, s2 *project.Project) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if s1.ID != s2.ID {
+			return fmt.Errorf("Expected same IDs but they are not the same.")
+		}
+		return nil
+	}
+}
+
+func testAccCheckActualProjectHasValues(actual *project.Project, want *project.Project) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if actual.Name != want.Name {
+			return fmt.Errorf("name is not correct, expected: %s, got: %s", want.Name, actual.Name)
+		}
+		if actual.ID == "" {
+			return fmt.Errorf("ID is empty")
+		}
+
+		return nil
+	}
+}
+
+// Test whether the project was destroyed properly and finishes the job if necessary
 func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		client := vercel.New(os.Getenv("VERCEL_TOKEN"))
@@ -42,8 +107,12 @@ func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 
 			project, err := client.Project.Read(rs.Primary.ID)
 			if err == nil {
-				_ = client.Project.Delete(project.ID)
-				return fmt.Errorf("Project still exists on vercel")
+				message := "Project was not deleted from vercel during terraform destroy."
+				deleteErr := client.Project.Delete(project.Name)
+				if deleteErr != nil {
+					return fmt.Errorf(message+" Automated removal did not succeed. Please manually remove @%s. Error: %w", project.Name, err)
+				}
+				return fmt.Errorf(message + " It was removed now.")
 			}
 
 		}
@@ -51,7 +120,7 @@ func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 	}
 
 }
-func testAccCheckVercelProjectConfigBasic(name string) string {
+func testAccCheckVercelProjectConfig(name string) string {
 	return fmt.Sprintf(`
 	resource "vercel_project" "new" {
 		name = "%s"
@@ -63,7 +132,7 @@ func testAccCheckVercelProjectConfigBasic(name string) string {
 	`, name)
 }
 
-func testAccCheckVercelProjectExists(n string) resource.TestCheckFunc {
+func testAccCheckVercelProjectExists(n string, actual *project.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -75,6 +144,11 @@ func testAccCheckVercelProjectExists(n string) resource.TestCheckFunc {
 			return fmt.Errorf("No project set")
 		}
 
+		project, err := vercel.New(os.Getenv("VERCEL_TOKEN")).Project.Read(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+		*actual = project
 		return nil
 	}
 }

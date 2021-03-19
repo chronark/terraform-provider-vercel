@@ -29,11 +29,11 @@ type User struct {
 }
 
 type UserHandler struct {
-	Api *httpApi.Api
+	Api httpApi.API
 }
 
 func (p *UserHandler) Read() (user User, err error) {
-	res, err := p.Api.Get("/www/user")
+	res, err := p.Api.Request("GET", "/www/user", nil)
 	if err != nil {
 		return User{}, fmt.Errorf("Unable to fetch user from vercel: %w", err)
 	}

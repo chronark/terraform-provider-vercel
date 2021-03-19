@@ -5,8 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"io"
 	"net/http"
 )
+
+type API interface {
+	Request(method string, path string, body interface{}) (*http.Response, error)
+}
 
 type Api struct {
 	url        string
@@ -15,7 +20,7 @@ type Api struct {
 	token      string
 }
 
-func New(token string) *Api {
+func New(token string) API {
 	return &Api{
 		url:        "https://api.vercel.com",
 		httpClient: &http.Client{},
@@ -36,15 +41,6 @@ func (c *Api) setHeaders(req *http.Request) {
 	req.Header.Set("User-Agent", c.userAgent)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.token))
-}
-
-func (c *Api) Get(path string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s", c.url, path), nil)
-	if err != nil {
-		return nil, err
-	}
-	return c.do(req)
-
 }
 
 func (c *Api) do(req *http.Request) (*http.Response, error) {
@@ -73,33 +69,20 @@ func (c *Api) do(req *http.Request) (*http.Response, error) {
 	return res, nil
 }
 
-func (c *Api) Post(path string, body interface{}) (*http.Response, error) {
-	encodedBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
+func (c *Api) Request(method string, path string, body interface{}) (*http.Response, error) {
+	var payload io.Reader = nil
+	if body != nil {
+		b, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+		payload = bytes.NewBuffer(b)
 	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s", c.url, path), bytes.NewBuffer(encodedBody))
-	if err != nil {
-		return nil, err
-	}
-	return c.do(req)
-}
 
-func (c *Api) Delete(path string) (*http.Response, error) {
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s%s", c.url, path), nil)
+	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", c.url, path), payload)
 	if err != nil {
 		return nil, err
 	}
 	return c.do(req)
-}
-func (c *Api) Patch(path string, body interface{}) (*http.Response, error) {
-	encodedBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	req, err := http.NewRequest("PATCH", fmt.Sprintf("%s%s", c.url, path), bytes.NewBuffer(encodedBody))
-	if err != nil {
-		return nil, err
-	}
-	return c.do(req)
+
 }
