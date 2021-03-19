@@ -22,11 +22,11 @@ type CreateSecret struct {
 }
 
 type Handler struct {
-	Api *httpApi.Api
+	Api httpApi.API
 }
 
 func (h *Handler) Create(secret CreateSecret) (string, error) {
-	res, err := h.Api.Post("/v2/now/secrets", secret)
+	res, err := h.Api.Request("POST","/v2/now/secrets", secret)
 	if err != nil {
 		return "", err
 	}
@@ -43,7 +43,7 @@ func (h *Handler) Create(secret CreateSecret) (string, error) {
 
 // Read returns environment variables associated with a project
 func (h *Handler) Read(secretID string) (secret Secret, err error) {
-	res, err := h.Api.Get(fmt.Sprintf("/v3/now/secrets/%s", secretID))
+	res, err := h.Api.Request("GET", fmt.Sprintf("/v3/now/secrets/%s", secretID), nil)
 	if err != nil {
 		return Secret{}, fmt.Errorf("Unable to fetch secret from vercel: %w", err)
 	}
@@ -63,7 +63,7 @@ func (h *Handler) Update(oldName, newName string) error {
 		Name: newName,
 	}
 
-	res, err := h.Api.Patch(fmt.Sprintf("/v2/now/secrets/%s", oldName), payload)
+	res, err := h.Api.Request("PATCH",fmt.Sprintf("/v2/now/secrets/%s", oldName), payload)
 	if err != nil {
 		return fmt.Errorf("Unable to update secret: %w", err)
 	}
@@ -71,7 +71,7 @@ func (h *Handler) Update(oldName, newName string) error {
 	return nil
 }
 func (h *Handler) Delete(secretName string) error {
-	res, err := h.Api.Delete(fmt.Sprintf("/v2/now/secrets/%s", secretName))
+	res, err := h.Api.Request("DELETE",fmt.Sprintf("/v2/now/secrets/%s", secretName),nil)
 	if err != nil {
 		return fmt.Errorf("Unable to delete secret: %w", err)
 	}
