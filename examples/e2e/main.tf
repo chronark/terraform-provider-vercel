@@ -7,9 +7,7 @@ terraform {
   }
 }
 
-provider "vercel" {
-  token = "wsByP9ptGqn7snGvvY00aDzn"
-}
+provider "vercel" {}
 
 resource "vercel_project" "my_project" {
   name = "mercury-via-terraform"
