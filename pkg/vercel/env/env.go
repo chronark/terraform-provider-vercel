@@ -81,7 +81,7 @@ func (h *Handler) Read(projectID string) (envs []Env, err error) {
 	return envResponse.Envs, nil
 }
 func (h *Handler) Update(projectID string, envID string, env CreateOrUpdateEnv) error {
-	res, err := h.Api.Request("PATCH",fmt.Sprintf("/v6/projects/%s/env/%s", projectID, envID), env)
+	res, err := h.Api.Request("PATCH", fmt.Sprintf("/v6/projects/%s/env/%s", projectID, envID), env)
 	if err != nil {
 		return fmt.Errorf("Unable to update env: %w", err)
 	}
@@ -89,7 +89,7 @@ func (h *Handler) Update(projectID string, envID string, env CreateOrUpdateEnv) 
 	return nil
 }
 func (h *Handler) Delete(projectID, envKey string) error {
-	res, err := h.Api.Request("DELETE",fmt.Sprintf("/v4/projects/%s/env/%s", projectID, envKey),nil)
+	res, err := h.Api.Request("DELETE", fmt.Sprintf("/v4/projects/%s/env/%s", projectID, envKey), nil)
 	if err != nil {
 		return fmt.Errorf("Unable to delete env: %w", err)
 	}

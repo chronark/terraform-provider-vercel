@@ -11,7 +11,7 @@ type ProjectHandler struct {
 }
 
 func (p *ProjectHandler) Create(project CreateProject) (string, error) {
-	res, err := p.Api.Request("POST","/v6/projects", project)
+	res, err := p.Api.Request("POST", "/v6/projects", project)
 	if err != nil {
 		return "", err
 	}
@@ -26,7 +26,7 @@ func (p *ProjectHandler) Create(project CreateProject) (string, error) {
 	return createdProject.ID, nil
 }
 func (p *ProjectHandler) Read(id string) (project Project, err error) {
-	res, err := p.Api.Request("GET",fmt.Sprintf("/v1/projects/%s", id),nil)
+	res, err := p.Api.Request("GET", fmt.Sprintf("/v1/projects/%s", id), nil)
 	if err != nil {
 		return Project{}, fmt.Errorf("Unable to fetch project from vercel: %w", err)
 	}
@@ -39,7 +39,7 @@ func (p *ProjectHandler) Read(id string) (project Project, err error) {
 	return project, nil
 }
 func (p *ProjectHandler) Update(id string, project UpdateProject) error {
-	res, err := p.Api.Request("PATCH",fmt.Sprintf("/v2/projects/%s", id), project)
+	res, err := p.Api.Request("PATCH", fmt.Sprintf("/v2/projects/%s", id), project)
 	if err != nil {
 		return fmt.Errorf("Unable to update project: %w", err)
 	}
@@ -47,7 +47,7 @@ func (p *ProjectHandler) Update(id string, project UpdateProject) error {
 	return nil
 }
 func (p *ProjectHandler) Delete(id string) error {
-	res, err := p.Api.Request("DELETE",fmt.Sprintf("/v1/projects/%s", id),nil)
+	res, err := p.Api.Request("DELETE", fmt.Sprintf("/v1/projects/%s", id), nil)
 	if err != nil {
 		return fmt.Errorf("Unable to delete project: %w", err)
 	}

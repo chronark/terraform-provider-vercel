@@ -19,8 +19,6 @@ resource "vercel_project" "my_project" {
     type = "github"
     repo = "chronark/mercury"
   }
-
-
 }
 ```
 
@@ -34,6 +32,7 @@ resource "vercel_project" "my_project" {
 
 ### Optional
 
+- **alias** (List of String) A list of production domains for the project.
 - **build_command** (String) The build command for this project. When null is used this value will be automatically detected.
 - **dev_command** (String) The dev command for this project. When null is used this value will be automatically detected.
 - **framework** (String) The framework that is being used for this project. When null is used no framework is selected.
