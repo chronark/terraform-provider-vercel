@@ -49,6 +49,21 @@ func TestAccVercelProject(t *testing.T) {
 					testAccCheckProjectWasNotRecreated(&actualProjectAfterCreation, &actualProjectAfterUpdate),
 				),
 			},
+			{
+				Config: testAccCheckVercelProjectConfigWithOverridenCommands(projectName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVercelProjectExists("vercel_project.new", &actualProjectAfterUpdate),
+					testAccCheckProjectStateHasValues(
+						"vercel_project.new", project.Project{
+							Name:            projectName,
+							InstallCommand:  "echo install",
+							BuildCommand:    "echo build",
+							DevCommand:      "echo dev",
+							OutputDirectory: "out",
+						},
+					),
+				),
+			},
 		},
 	})
 }
@@ -57,8 +72,15 @@ func TestAccVercelProject(t *testing.T) {
 func testAccCheckProjectStateHasValues(name string, want project.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		tests := []resource.TestCheckFunc{
+
 			resource.TestCheckResourceAttr(
-				name, "name", want.Name),
+				name, "install_command", want.InstallCommand),
+			resource.TestCheckResourceAttr(
+				name, "build_command", want.BuildCommand),
+			resource.TestCheckResourceAttr(
+				name, "dev_command", want.DevCommand),
+			resource.TestCheckResourceAttr(
+				name, "output_directory", want.OutputDirectory),
 		}
 
 		for _, test := range tests {
@@ -128,6 +150,22 @@ func testAccCheckVercelProjectConfig(name string) string {
 			type = "github"
 			repo = "chronark/mercury"
 		}
+	}
+	`, name)
+}
+
+func testAccCheckVercelProjectConfigWithOverridenCommands(name string) string {
+	return fmt.Sprintf(`
+	resource "vercel_project" "new" {
+		name = "%s"
+		git_repository {
+			type = "github"
+			repo = "chronark/mercury"
+		}
+		install_command  = "echo install"
+		build_command 	 = "echo build"
+		dev_command 	 = "echo dev"
+		output_directory = "out"
 	}
 	`, name)
 }
