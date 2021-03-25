@@ -112,6 +112,15 @@ func resourceProject() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"alias": {
+				Description: "A list of production domains for the project.",
+				Type:        schema.TypeList,
+				Computed:    true,
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 		},
 	}
 }
@@ -210,6 +219,15 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 		return diag.FromErr(err)
 	}
 	err = d.Set("node_version", project.NodeVersion)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	aliases := make([]string, 0)
+	for i := 0; i < len(project.Alias); i++ {
+		aliases = append(aliases, project.Alias[i].Domain)
+	}
+	err = d.Set("alias", aliases)
 	if err != nil {
 		return diag.FromErr(err)
 	}
