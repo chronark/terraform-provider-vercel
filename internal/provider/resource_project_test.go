@@ -22,6 +22,9 @@ func TestAccVercelProject(t *testing.T) {
 
 		// Renaming or changing a variable should not result in the recreation of the project, so we expect to have the same id.
 		actualProjectAfterUpdate project.Project
+
+		// Used everywhere else
+		actualProject project.Project
 	)
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -49,6 +52,29 @@ func TestAccVercelProject(t *testing.T) {
 					testAccCheckProjectWasNotRecreated(&actualProjectAfterCreation, &actualProjectAfterUpdate),
 				),
 			},
+			{
+				Config: testAccCheckVercelProjectConfigWithOverridenCommands(projectName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVercelProjectExists("vercel_project.new", &actualProject),
+					testAccCheckProjectStateHasValues(
+						"vercel_project.new", project.Project{
+							Name:            projectName,
+							InstallCommand:  "echo install",
+							BuildCommand:    "echo build",
+							DevCommand:      "echo dev",
+							OutputDirectory: "out",
+						},
+					),
+					testAccCheckActualProjectHasValues(&actualProject, &project.Project{
+						Name:            projectName,
+						InstallCommand:  "echo install",
+						BuildCommand:    "echo build",
+						DevCommand:      "echo dev",
+						OutputDirectory: "out",
+					},
+					),
+				),
+			},
 		},
 	})
 }
@@ -57,8 +83,15 @@ func TestAccVercelProject(t *testing.T) {
 func testAccCheckProjectStateHasValues(name string, want project.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		tests := []resource.TestCheckFunc{
+
 			resource.TestCheckResourceAttr(
-				name, "name", want.Name),
+				name, "install_command", want.InstallCommand),
+			resource.TestCheckResourceAttr(
+				name, "build_command", want.BuildCommand),
+			resource.TestCheckResourceAttr(
+				name, "dev_command", want.DevCommand),
+			resource.TestCheckResourceAttr(
+				name, "output_directory", want.OutputDirectory),
 		}
 
 		for _, test := range tests {
@@ -85,10 +118,23 @@ func testAccCheckProjectWasNotRecreated(s1, s2 *project.Project) resource.TestCh
 func testAccCheckActualProjectHasValues(actual *project.Project, want *project.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if actual.Name != want.Name {
-			return fmt.Errorf("name is not correct, expected: %s, got: %s", want.Name, actual.Name)
+			return fmt.Errorf("name does not match, expected: %s, got: %s", want.Name, actual.Name)
 		}
 		if actual.ID == "" {
 			return fmt.Errorf("ID is empty")
+		}
+
+		if actual.InstallCommand != want.InstallCommand {
+			return fmt.Errorf("install_command does not match: expected: %s, got: %s", want.InstallCommand, actual.InstallCommand)
+		}
+		if actual.BuildCommand != want.BuildCommand {
+			return fmt.Errorf("build_command does not match: expected: %s, got: %s", want.BuildCommand, actual.BuildCommand)
+		}
+		if actual.DevCommand != want.DevCommand {
+			return fmt.Errorf("dev_command does not match: expected: %s, got: %s", want.DevCommand, actual.DevCommand)
+		}
+		if actual.OutputDirectory != want.OutputDirectory {
+			return fmt.Errorf("output_directory does not match: expected: %s, got: %s", want.OutputDirectory, actual.OutputDirectory)
 		}
 
 		return nil
@@ -128,6 +174,22 @@ func testAccCheckVercelProjectConfig(name string) string {
 			type = "github"
 			repo = "chronark/mercury"
 		}
+	}
+	`, name)
+}
+
+func testAccCheckVercelProjectConfigWithOverridenCommands(name string) string {
+	return fmt.Sprintf(`
+	resource "vercel_project" "new" {
+		name = "%s"
+		git_repository {
+			type = "github"
+			repo = "chronark/mercury"
+		}
+		install_command  = "echo install"
+		build_command 	 = "echo build"
+		dev_command 	 = "echo dev"
+		output_directory = "out"
 	}
 	`, name)
 }
