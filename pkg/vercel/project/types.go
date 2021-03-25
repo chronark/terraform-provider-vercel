@@ -179,15 +179,6 @@ type CreateProject struct {
 		Type string `json:"type"`
 		Repo string `json:"repo"`
 	} `json:"gitRepository,omitempty"`
-	Env []struct {
-		Type            string      `json:"type,omitempty"`
-		ID              string      `json:"id,omitempty"`
-		Key             string      `json:"key,omitempty"`
-		Value           string      `json:"value,omitempty"`
-		ConfigurationID interface{} `json:"configurationId,omitempty"`
-		UpdatedAt       int64       `json:"updatedAt,omitempty"`
-		CreatedAt       int64       `json:"createdAt,omitempty"`
-	} `json:"env,omitempty"`
 	UpdateProject
 }
 
