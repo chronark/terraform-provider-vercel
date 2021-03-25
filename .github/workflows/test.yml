@@ -62,7 +62,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
-      max-parallel: 1
       fail-fast: false
       matrix:
         # list whatever Terraform versions here you would like to support
