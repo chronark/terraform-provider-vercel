@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -29,7 +30,7 @@ func resourceProject() *schema.Resource {
 				Required:    true,
 			},
 			"git_repository": {
-				Description: "The Git Repository that will be connected to the project. Any pushes to the specified connected Git Repository will be automatically deployed.",
+				Description: "The git repository that will be connected to the project. Any pushes to the specified connected git repository will be automatically deployed.",
 				Required:    true,
 				ForceNew:    true,
 				Type:        schema.TypeList,
@@ -37,12 +38,12 @@ func resourceProject() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
-							Description: "The Git Provider of the repository. Must be either `github`, `gitlab`, or `bitbucket`.",
+							Description: "The git provider of the repository. Must be either `github`, `gitlab`, or `bitbucket`.",
 							Type:        schema.TypeString,
 							Required:    true,
 						},
 						"repo": {
-							Description: "The name of the Git Repository.",
+							Description: "The name of the git repository. For example: `chronark/terraform-provider-vercel`",
 							Type:        schema.TypeString,
 							Required:    true,
 						},
@@ -94,6 +95,7 @@ func resourceProject() *schema.Resource {
 				Description: "The output directory of the project. When null is used this value will be automatically detected.",
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     nil,
 			},
 			"serverless_function_region": {
 				Description: "The region to deploy Serverless Functions in this project.",
@@ -105,6 +107,7 @@ func resourceProject() *schema.Resource {
 				Description: "The name of a directory or relative path to the source code of your project. When null is used it will default to the project root.",
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     nil,
 			},
 			"node_version": {
 				Description: "The Node.js Version for this project.",

@@ -27,7 +27,7 @@ resource "vercel_project" "my_project" {
 
 ### Required
 
-- **git_repository** (Block List, Min: 1, Max: 1) The Git Repository that will be connected to the project. Any pushes to the specified connected Git Repository will be automatically deployed. (see [below for nested schema](#nestedblock--git_repository))
+- **git_repository** (Block List, Min: 1, Max: 1) The git repository that will be connected to the project. Any pushes to the specified connected git repository will be automatically deployed. (see [below for nested schema](#nestedblock--git_repository))
 - **name** (String) The name of the project.
 
 ### Optional
@@ -55,7 +55,7 @@ resource "vercel_project" "my_project" {
 
 Required:
 
-- **repo** (String) The name of the Git Repository.
-- **type** (String) The Git Provider of the repository. Must be either `github`, `gitlab`, or `bitbucket`.
+- **repo** (String) The name of the git repository. For example: `chronark/terraform-provider-vercel`
+- **type** (String) The git provider of the repository. Must be either `github`, `gitlab`, or `bitbucket`.
 
 
