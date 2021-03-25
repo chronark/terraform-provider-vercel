@@ -59,23 +59,23 @@ type Project struct {
 		DisabledAt int64  `json:"disabledAt"`
 		CanceledAt int64  `json:"canceledAt"`
 	} `json:"analytics"`
-	AutoExposeSystemEnvs            bool        `json:"autoExposeSystemEnvs"`
-	BuildCommand                    interface{} `json:"buildCommand"`
-	CreatedAt                       int64       `json:"createdAt"`
-	DevCommand                      interface{} `json:"devCommand"`
-	DirectoryListing                bool        `json:"directoryListing"`
-	Env                             []env.Env   `json:"env"`
-	Framework                       string      `json:"framework"`
-	ID                              string      `json:"id"`
-	InstallCommand                  string      `json:"installCommand"`
-	Name                            string      `json:"name"`
-	NodeVersion                     string      `json:"nodeVersion"`
-	OutputDirectory                 string      `json:"outputDirectory"`
-	PublicSource                    bool        `json:"publicSource"`
-	RootDirectory                   string      `json:"rootDirectory"`
-	ServerlessFunctionRegion        string      `json:"serverlessFunctionRegion"`
-	SourceFilesOutsideRootDirectory bool        `json:"sourceFilesOutsideRootDirectory"`
-	UpdatedAt                       int64       `json:"updatedAt"`
+	AutoExposeSystemEnvs            bool      `json:"autoExposeSystemEnvs"`
+	BuildCommand                    string    `json:"buildCommand"`
+	CreatedAt                       int64     `json:"createdAt"`
+	DevCommand                      string    `json:"devCommand"`
+	DirectoryListing                bool      `json:"directoryListing"`
+	Env                             []env.Env `json:"env"`
+	Framework                       string    `json:"framework"`
+	ID                              string    `json:"id"`
+	InstallCommand                  string    `json:"installCommand"`
+	Name                            string    `json:"name"`
+	NodeVersion                     string    `json:"nodeVersion"`
+	OutputDirectory                 string    `json:"outputDirectory"`
+	PublicSource                    bool      `json:"publicSource"`
+	RootDirectory                   string    `json:"rootDirectory"`
+	ServerlessFunctionRegion        string    `json:"serverlessFunctionRegion"`
+	SourceFilesOutsideRootDirectory bool      `json:"sourceFilesOutsideRootDirectory"`
+	UpdatedAt                       int64     `json:"updatedAt"`
 	Link                            struct {
 		Type             string        `json:"type"`
 		Repo             string        `json:"repo"`

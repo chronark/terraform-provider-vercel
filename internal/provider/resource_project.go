@@ -145,11 +145,44 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 		},
 	}
 
-	framework, frameWorkSet := d.GetOk("framework")
-	if frameWorkSet {
+	framework, frameworkSet := d.GetOk("framework")
+	if frameworkSet {
 		project.Framework = framework.(string)
 	}
+	publicSource, publicSourceSet := d.GetOk("public_source")
+	if publicSourceSet {
+		project.PublicSource = publicSource.(bool)
+	}
+	installCommand, installCommandSet := d.GetOk("install_command")
+	if installCommandSet {
+		project.InstallCommand = installCommand.(string)
+	}
+	buildCommand, buildCommandSet := d.GetOk("build_command")
+	if buildCommandSet {
+		project.BuildCommand = buildCommand.(string)
+	}
+	devCommand, devCommandSet := d.GetOk("dev_command")
+	if devCommandSet {
+		project.DevCommand = devCommand.(string)
+	}
+	outputDirectory, outputDirectorySet := d.GetOk("output_directory")
+	if outputDirectorySet {
+		project.OutputDirectory = outputDirectory.(string)
+	}
 
+	serverlessFunctionRegion, serverlessFunctionRegionSet := d.GetOk("serverless_function_region")
+	if serverlessFunctionRegionSet {
+		project.ServerlessFunctionRegion = serverlessFunctionRegion.(string)
+	}
+	rootDirectory, rootDirectorySet := d.GetOk("root_directory")
+	if rootDirectorySet {
+		project.RootDirectory = rootDirectory.(string)
+	}
+	nodeVersion, nodeVersionSet := d.GetOk("node_version")
+	if nodeVersionSet {
+		project.NodeVersion = nodeVersion.(string)
+
+	}
 	id, err := client.Project.Create(project)
 
 	if err != nil {
