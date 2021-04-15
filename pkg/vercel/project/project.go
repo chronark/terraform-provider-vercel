@@ -10,8 +10,13 @@ type ProjectHandler struct {
 	Api httpApi.API
 }
 
-func (p *ProjectHandler) Create(project CreateProject) (string, error) {
-	res, err := p.Api.Request("POST", "/v6/projects", project)
+func (p *ProjectHandler) Create(project CreateProject, teamId string) (string, error) {
+	url := "/v6/projects"
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+
+	res, err := p.Api.Request("POST", url, project)
 	if err != nil {
 		return "", err
 	}

@@ -38,6 +38,7 @@ func New(version string) func() *schema.Provider {
 			},
 			DataSourcesMap: map[string]*schema.Resource{
 				"vercel_user": dataSourceUser(),
+				"vercel_team": dataSourceTeam(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
 				"vercel_env":     resourceEnv(),

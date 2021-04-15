@@ -7,7 +7,14 @@ terraform {
   }
 }
 
-provider "vercel" {}
+provider "vercel" {
+  token = "cwWSCeYIsBBlYuN9XdbHwKC8"
+}
+
+
+data "vercel_team" "triebwork" {
+  slug = "triebwork"
+}
 
 resource "vercel_project" "my_project" {
   name = "mercury-via-terraform"

@@ -183,7 +183,7 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 		project.NodeVersion = nodeVersion.(string)
 
 	}
-	id, err := client.Project.Create(project)
+	id, err := client.Project.Create(project, "")
 
 	if err != nil {
 		return diag.FromErr(err)
