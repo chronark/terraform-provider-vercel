@@ -50,6 +50,11 @@ func resourceProject() *schema.Resource {
 					},
 				},
 			},
+			"team_id": {
+				Description: "Access the projects of a team instead of your own ones",
+				Type:        schema.TypeString,
+				Optional:    true,
+			},
 			"account_id": {
 				Description: "The unique ID of the user or team the project belongs to.",
 				Type:        schema.TypeString,
@@ -183,7 +188,12 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 		project.NodeVersion = nodeVersion.(string)
 
 	}
-	id, err := client.Project.Create(project)
+
+	// Is empty when no team_id is specified
+	// client.Project.Create treats an empty string as a personal account
+	teamId := d.Get("team_id")
+
+	id, err := client.Project.Create(project, teamId.(string))
 
 	if err != nil {
 		return diag.FromErr(err)

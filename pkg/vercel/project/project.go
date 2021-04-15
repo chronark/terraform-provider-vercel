@@ -3,6 +3,8 @@ package project
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/httpApi"
 )
 
@@ -10,8 +12,14 @@ type ProjectHandler struct {
 	Api httpApi.API
 }
 
-func (p *ProjectHandler) Create(project CreateProject) (string, error) {
-	res, err := p.Api.Request("POST", "/v6/projects", project)
+func (p *ProjectHandler) Create(project CreateProject, teamId string) (string, error) {
+
+	url := "/v6/projects"
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+
+	res, err := p.Api.Request("POST", url, project)
 	if err != nil {
 		return "", err
 	}
@@ -34,7 +42,9 @@ func (p *ProjectHandler) Read(id string) (project Project, err error) {
 
 	err = json.NewDecoder(res.Body).Decode(&project)
 	if err != nil {
-		return Project{}, fmt.Errorf("Unable to unmarshal project: %w", err)
+		buf, _ := ioutil.ReadAll(res.Body)
+
+		return Project{}, fmt.Errorf("Unable to unmarshal project [%+v]: %w", string(buf), err)
 	}
 	return project, nil
 }

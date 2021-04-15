@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -52,17 +51,12 @@ func (c *Api) do(req *http.Request) (*http.Response, error) {
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		defer res.Body.Close()
 
-		var x map[string]interface{}
-		_ = json.NewDecoder(res.Body).Decode(&x)
-		log.Printf("%+v\n", x)
-
 		var vercelError VercelError
 		err = json.NewDecoder(res.Body).Decode(&vercelError)
 		if err != nil {
-			var body map[string]interface{}
-			_ = json.NewDecoder(res.Body).Decode(&body)
-
-			return nil, fmt.Errorf("Request was not successfull [ %s ], but I could not unmarshal the response body: %w. Request was: %+v. Raw response body was: %s", res.Status, err, req, body)
+			var x map[string]interface{}
+			_ = json.NewDecoder(res.Body).Decode(&x)
+			return nil, fmt.Errorf("Request was not successfull [ %s ]\nCould not unmarshal the response body:\n%w\nRequest was: %+v\nRaw response body was: %+v", res.Status, err, req, x)
 		}
 		return nil, fmt.Errorf("Error during http request: [ %s ] - %s", vercelError.Error.Code, vercelError.Error.Message)
 	}
@@ -83,6 +77,9 @@ func (c *Api) Request(method string, path string, body interface{}) (*http.Respo
 	if err != nil {
 		return nil, err
 	}
-	return c.do(req)
-
+	res, err := c.do(req)
+	if err != nil {
+		return &http.Response{}, fmt.Errorf("Request was: %s %s %+v: %w", method, path, payload, err)
+	}
+	return res, nil
 }

@@ -46,7 +46,7 @@ func (p *UserHandler) Read() (user User, err error) {
 	var userResponse UserResponse
 	err = json.NewDecoder(res.Body).Decode(&userResponse)
 	if err != nil {
-		return User{}, fmt.Errorf("Unable to unmarshal project: %w", err)
+		return User{}, fmt.Errorf("Unable to unmarshal user: %w", err)
 	}
 	return userResponse.User, nil
 }

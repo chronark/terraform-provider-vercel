@@ -42,6 +42,7 @@ resource "vercel_project" "my_project" {
 - **public_source** (Boolean) Specifies whether the source code and logs of the deployments for this project should be public or not.
 - **root_directory** (String) The name of a directory or relative path to the source code of your project. When null is used it will default to the project root.
 - **serverless_function_region** (String) The region to deploy Serverless Functions in this project.
+- **team_id** (String) Access the projects of a team instead of your own ones
 
 ### Read-Only
 
