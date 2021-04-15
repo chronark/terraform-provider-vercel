@@ -8,7 +8,6 @@ terraform {
 }
 
 provider "vercel" {
-  token = "cwWSCeYIsBBlYuN9XdbHwKC8"
 }
 
 
@@ -26,12 +25,19 @@ resource "vercel_project" "my_project" {
 }
 
 
+resource "vercel_secret" "my_secret" {
+  name    = "hello"
+  value   = "world"
+  team_id = data.vercel_team.triebwork.id
+}
+
 resource "vercel_env" "my_env" {
-  project_id = vercel_project.my_project.id
-  type       = "plain"
-  key        = "hello"
-  value      = "world"
-  target     = ["production", "preview", "development"]
   team_id    = data.vercel_team.triebwork.id
+  project_id = vercel_project.my_project.id
+
+  type   = "secret"
+  value  = vercel_secret.my_secret.id
+  key    = "world"
+  target = ["production", "preview", "development"]
 
 }
