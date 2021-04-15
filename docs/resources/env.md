@@ -37,6 +37,10 @@ resource "vercel_env" "my_env" {
 - **type** (String) The type can be `plain`, `secret`, or `system`.
 - **value** (String) If the type is `plain`, a string representing the value of the environment variable. If the type is `secret`, the secret ID of the secret attached to the environment variable. If the type is `system`, the name of the System Environment Variable.
 
+### Optional
+
+- **team_id** (String) By default, you can access resources contained within your own user account. To access resources owned by a team, you can pass in the team ID
+
 ### Read-Only
 
 - **created_at** (Number) A number containing the date when the variable was created in milliseconds.

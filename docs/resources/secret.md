@@ -37,11 +37,14 @@ resource "vercel_env" "env" {
 - **name** (String) The name of the secret.
 - **value** (String, Sensitive) The value of the new secret.
 
+### Optional
+
+- **team_id** (String) By default, you can access resources contained within your own user account. To access resources owned by a team, you can pass in the team ID
+
 ### Read-Only
 
 - **created_at** (Number) A number containing the date when the variable was created in milliseconds.
 - **id** (String) The unique identifier of the secret.
-- **team_id** (String) The team unique identifier to which the secret belongs to.
 - **user_id** (String) The unique identifier of the user who created the secret.
 
 

@@ -38,16 +38,16 @@ type Project struct {
 				GithubCommitRepo        string `json:"githubCommitRepo"`
 				GithubCommitRepoID      string `json:"githubCommitRepoId"`
 			} `json:"meta"`
-			Name       string      `json:"name"`
-			Plan       string      `json:"plan"`
-			Private    bool        `json:"private"`
-			ReadyState string      `json:"readyState"`
-			Target     string      `json:"target"`
-			TeamID     interface{} `json:"teamId"`
-			Type       string      `json:"type"`
-			URL        string      `json:"url"`
-			UserID     string      `json:"userId"`
-			WithCache  bool        `json:"withCache"`
+			Name       string `json:"name"`
+			Plan       string `json:"plan"`
+			Private    bool   `json:"private"`
+			ReadyState string `json:"readyState"`
+			Target     string `json:"target"`
+			TeamID     string `json:"teamId"`
+			Type       string `json:"type"`
+			URL        string `json:"url"`
+			UserID     string `json:"userId"`
+			WithCache  bool   `json:"withCache"`
 		} `json:"deployment"`
 		Domain      string `json:"domain"`
 		Environment string `json:"environment"`
@@ -122,7 +122,7 @@ type Project struct {
 		Private    bool        `json:"private"`
 		ReadyState string      `json:"readyState"`
 		Target     interface{} `json:"target"`
-		TeamID     interface{} `json:"teamId"`
+		TeamID     string      `json:"teamId"`
 		Type       string      `json:"type"`
 		URL        string      `json:"url"`
 		UserID     string      `json:"userId"`
@@ -158,16 +158,16 @@ type Project struct {
 				GithubCommitRepo        string `json:"githubCommitRepo"`
 				GithubCommitRepoID      string `json:"githubCommitRepoId"`
 			} `json:"meta"`
-			Name       string      `json:"name"`
-			Plan       string      `json:"plan"`
-			Private    bool        `json:"private"`
-			ReadyState string      `json:"readyState"`
-			Target     string      `json:"target"`
-			TeamID     interface{} `json:"teamId"`
-			Type       string      `json:"type"`
-			URL        string      `json:"url"`
-			UserID     string      `json:"userId"`
-			WithCache  bool        `json:"withCache"`
+			Name       string `json:"name"`
+			Plan       string `json:"plan"`
+			Private    bool   `json:"private"`
+			ReadyState string `json:"readyState"`
+			Target     string `json:"target"`
+			TeamID     string `json:"teamId"`
+			Type       string `json:"type"`
+			URL        string `json:"url"`
+			UserID     string `json:"userId"`
+			WithCache  bool   `json:"withCache"`
 		} `json:"production"`
 	} `json:"targets"`
 }

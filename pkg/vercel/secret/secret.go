@@ -42,8 +42,13 @@ func (h *Handler) Create(secret CreateSecret) (string, error) {
 }
 
 // Read returns environment variables associated with a project
-func (h *Handler) Read(secretID string) (secret Secret, err error) {
-	res, err := h.Api.Request("GET", fmt.Sprintf("/v3/now/secrets/%s", secretID), nil)
+func (h *Handler) Read(secretID, teamId string) (secret Secret, err error) {
+	url := fmt.Sprintf("/v3/now/secrets/%s", secretID)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+
+	res, err := h.Api.Request("GET", url, nil)
 	if err != nil {
 		return Secret{}, fmt.Errorf("Unable to fetch secret from vercel: %w", err)
 	}
@@ -55,23 +60,30 @@ func (h *Handler) Read(secretID string) (secret Secret, err error) {
 	}
 	return secret, nil
 }
-func (h *Handler) Update(oldName, newName string) error {
-
+func (h *Handler) Update(oldName, newName, teamId string) error {
+	url := fmt.Sprintf("/v2/now/secrets/%s", oldName)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
 	payload := struct {
 		Name string `json:"name"`
 	}{
 		Name: newName,
 	}
 
-	res, err := h.Api.Request("PATCH", fmt.Sprintf("/v2/now/secrets/%s", oldName), payload)
+	res, err := h.Api.Request("PATCH", url, payload)
 	if err != nil {
 		return fmt.Errorf("Unable to update secret: %w", err)
 	}
 	defer res.Body.Close()
 	return nil
 }
-func (h *Handler) Delete(secretName string) error {
-	res, err := h.Api.Request("DELETE", fmt.Sprintf("/v2/now/secrets/%s", secretName), nil)
+func (h *Handler) Delete(secretName, teamId string) error {
+	url := fmt.Sprintf("/v2/now/secrets/%s", secretName)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+	res, err := h.Api.Request("DELETE", url, nil)
 	if err != nil {
 		return fmt.Errorf("Unable to delete secret: %w", err)
 	}

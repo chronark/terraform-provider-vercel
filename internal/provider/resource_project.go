@@ -29,6 +29,13 @@ func resourceProject() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
+			"team_id": {
+				Description: "By default, you can access resources contained within your own user account. To access resources owned by a team, you can pass in the team ID",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Default:     "",
+			},
 			"git_repository": {
 				Description: "The git repository that will be connected to the project. Any pushes to the specified connected git repository will be automatically deployed.",
 				Required:    true,
@@ -183,7 +190,8 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 		project.NodeVersion = nodeVersion.(string)
 
 	}
-	id, err := client.Project.Create(project)
+
+	id, err := client.Project.Create(project, d.Get("team_id").(string))
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -199,7 +207,7 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 
 	id := d.Id()
 
-	project, err := client.Project.Read(id)
+	project, err := client.Project.Read(id, d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -307,7 +315,7 @@ func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta int
 		update.NodeVersion = d.Get("node_version").(string)
 	}
 
-	err := client.Project.Update(d.Id(), update)
+	err := client.Project.Update(d.Id(), update, d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -318,7 +326,7 @@ func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta int
 func resourceProjectDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	client := meta.(*vercel.Client)
-	err := client.Project.Delete(d.Id())
+	err := client.Project.Delete(d.Id(), d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}

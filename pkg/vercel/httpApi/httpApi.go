@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -59,10 +60,8 @@ func (c *Api) do(req *http.Request) (*http.Response, error) {
 		var vercelError VercelError
 		err = json.NewDecoder(res.Body).Decode(&vercelError)
 		if err != nil {
-			var body map[string]interface{}
-			_ = json.NewDecoder(res.Body).Decode(&body)
-
-			return nil, fmt.Errorf("Request was not successfull [ %s ], but I could not unmarshal the response body: %w. Request was: %+v. Raw response body was: %s", res.Status, err, req, body)
+			body, _ := ioutil.ReadAll(req.Body)
+			return nil, fmt.Errorf("Request was not successfull [ %s ]\nI could not unmarshal the response body: %w.\nRequest was: %+v.\nRaw request body was: %s", res.Status, err, req.URL, string(body))
 		}
 		return nil, fmt.Errorf("Error during http request: [ %s ] - %s", vercelError.Error.Code, vercelError.Error.Message)
 	}
