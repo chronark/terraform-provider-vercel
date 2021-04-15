@@ -40,8 +40,12 @@ type Handler struct {
 	Api httpApi.API
 }
 
-func (h *Handler) Create(projectID string, env CreateOrUpdateEnv) (string, error) {
-	res, err := h.Api.Request(http.MethodPost, fmt.Sprintf("/v6/projects/%s/env", projectID), env)
+func (h *Handler) Create(projectID string, env CreateOrUpdateEnv, teamId string) (string, error) {
+	url := fmt.Sprintf("/v6/projects/%s/env", projectID)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+	res, err := h.Api.Request(http.MethodPost, url, env)
 	if err != nil {
 		return "", err
 	}
@@ -58,8 +62,12 @@ func (h *Handler) Create(projectID string, env CreateOrUpdateEnv) (string, error
 }
 
 // Read returns environment variables associated with a project
-func (h *Handler) Read(projectID string) (envs []Env, err error) {
-	res, err := h.Api.Request("GET", fmt.Sprintf("/v6/projects/%s/env", projectID), nil)
+func (h *Handler) Read(projectID string, teamId string) (envs []Env, err error) {
+	url := fmt.Sprintf("/v6/projects/%s/env", projectID)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+	res, err := h.Api.Request("GET", url, nil)
 	if err != nil {
 		return []Env{}, fmt.Errorf("Unable to fetch environment variables from vercel: %w", err)
 	}
@@ -80,16 +88,25 @@ func (h *Handler) Read(projectID string) (envs []Env, err error) {
 	log.Printf("%+v\n\n", envResponse)
 	return envResponse.Envs, nil
 }
-func (h *Handler) Update(projectID string, envID string, env CreateOrUpdateEnv) error {
-	res, err := h.Api.Request("PATCH", fmt.Sprintf("/v6/projects/%s/env/%s", projectID, envID), env)
+func (h *Handler) Update(projectID string, envID string, env CreateOrUpdateEnv, teamId string) error {
+	url := fmt.Sprintf("/v6/projects/%s/env/%s", projectID, envID)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+
+	res, err := h.Api.Request("PATCH", url, env)
 	if err != nil {
 		return fmt.Errorf("Unable to update env: %w", err)
 	}
 	defer res.Body.Close()
 	return nil
 }
-func (h *Handler) Delete(projectID, envKey string) error {
-	res, err := h.Api.Request("DELETE", fmt.Sprintf("/v4/projects/%s/env/%s", projectID, envKey), nil)
+func (h *Handler) Delete(projectID, envKey string, teamId string) error {
+	url := fmt.Sprintf("/v4/projects/%s/env/%s", projectID, envKey)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+	res, err := h.Api.Request("DELETE", url, nil)
 	if err != nil {
 		return fmt.Errorf("Unable to delete env: %w", err)
 	}

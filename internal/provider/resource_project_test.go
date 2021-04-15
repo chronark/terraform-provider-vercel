@@ -151,10 +151,10 @@ func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 				continue
 			}
 
-			project, err := client.Project.Read(rs.Primary.ID)
+			project, err := client.Project.Read(rs.Primary.ID, "")
 			if err == nil {
 				message := "Project was not deleted from vercel during terraform destroy."
-				deleteErr := client.Project.Delete(project.Name)
+				deleteErr := client.Project.Delete(project.Name, "")
 				if deleteErr != nil {
 					return fmt.Errorf(message+" Automated removal did not succeed. Please manually remove @%s. Error: %w", project.Name, err)
 				}
@@ -206,7 +206,7 @@ func testAccCheckVercelProjectExists(n string, actual *project.Project) resource
 			return fmt.Errorf("No project set")
 		}
 
-		project, err := vercel.New(os.Getenv("VERCEL_TOKEN")).Project.Read(rs.Primary.ID)
+		project, err := vercel.New(os.Getenv("VERCEL_TOKEN")).Project.Read(rs.Primary.ID, "")
 		if err != nil {
 			return err
 		}

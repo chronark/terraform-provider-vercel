@@ -23,6 +23,13 @@ func resourceEnv() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
+			"team_id": {
+				Description: "By default, you can access resources contained within your own user account. To access resources owned by a team, you can pass in the team ID",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Default:     "",
+			},
 			"type": {
 				Description: "The type can be `plain`, `secret`, or `system`.",
 				Type:        schema.TypeString,
@@ -89,7 +96,7 @@ func resourceEnvCreate(ctx context.Context, d *schema.ResourceData, meta interfa
 
 	payload := toCreateOrUpdateEnv(d)
 
-	envID, err := client.Env.Create(d.Get("project_id").(string), payload)
+	envID, err := client.Env.Create(d.Get("project_id").(string), payload, d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -103,7 +110,7 @@ func resourceEnvRead(ctx context.Context, d *schema.ResourceData, meta interface
 	client := meta.(*vercel.Client)
 
 	id := d.Id()
-	allEnvVariables, err := client.Env.Read(d.Get("project_id").(string))
+	allEnvVariables, err := client.Env.Read(d.Get("project_id").(string), d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -156,7 +163,7 @@ func resourceEnvUpdate(ctx context.Context, d *schema.ResourceData, meta interfa
 		envID := d.Id()
 		payload := toCreateOrUpdateEnv(d)
 
-		err := client.Env.Update(projectID, envID, payload)
+		err := client.Env.Update(projectID, envID, payload, d.Get("team_id").(string))
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -171,7 +178,7 @@ func resourceEnvDelete(ctx context.Context, d *schema.ResourceData, meta interfa
 	projectID := d.Get("project_id").(string)
 	envKey := d.Get("key").(string)
 
-	err := client.Env.Delete(projectID, envKey)
+	err := client.Env.Delete(projectID, envKey, d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}

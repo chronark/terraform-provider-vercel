@@ -108,10 +108,10 @@ func testAccCheckVercelSecretDestroy(name string) resource.TestCheckFunc {
 				continue
 			}
 
-			secret, err := client.Secret.Read(rs.Primary.ID)
+			secret, err := client.Secret.Read(rs.Primary.ID, "")
 			if err == nil {
 				message := "Secret was not deleted from vercel during terraform destroy."
-				deleteErr := client.Secret.Delete(secret.Name)
+				deleteErr := client.Secret.Delete(secret.Name, "")
 				if deleteErr != nil {
 					return fmt.Errorf(message+" Automated removal did not succeed. Please manually remove @%s. Error: %w", secret.Name, err)
 				}
@@ -144,7 +144,7 @@ func testAccCheckVercelSecretExists(n string, actual *secret.Secret) resource.Te
 			return fmt.Errorf("No secret set")
 		}
 
-		secret, err := vercel.New(os.Getenv("VERCEL_TOKEN")).Secret.Read(rs.Primary.ID)
+		secret, err := vercel.New(os.Getenv("VERCEL_TOKEN")).Secret.Read(rs.Primary.ID, "")
 		if err != nil {
 			return err
 		}

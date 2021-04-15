@@ -22,6 +22,13 @@ func resourceSecret() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"team_id": {
+				Description: "By default, you can access resources contained within your own user account. To access resources owned by a team, you can pass in the team ID",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Default:     "",
+			},
 			"name": {
 				Description: "The name of the secret.",
 				Type:        schema.TypeString,
@@ -35,11 +42,7 @@ func resourceSecret() *schema.Resource {
 				Sensitive:   true,
 				ForceNew:    true,
 			},
-			"team_id": {
-				Description: "The team unique identifier to which the secret belongs to.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
+
 			"user_id": {
 				Description: "The unique identifier of the user who created the secret.",
 				Type:        schema.TypeString,
@@ -78,7 +81,7 @@ func resourceSecretRead(ctx context.Context, d *schema.ResourceData, meta interf
 
 	id := d.Id()
 
-	secret, err := client.Secret.Read(id)
+	secret, err := client.Secret.Read(id, d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -107,7 +110,7 @@ func resourceSecretDelete(ctx context.Context, d *schema.ResourceData, meta inte
 
 	client := meta.(*vercel.Client)
 
-	err := client.Secret.Delete(d.Get("name").(string))
+	err := client.Secret.Delete(d.Get("name").(string), d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
