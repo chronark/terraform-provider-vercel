@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -55,15 +53,14 @@ func (c *Api) do(req *http.Request) (*http.Response, error) {
 
 		var x map[string]interface{}
 		_ = json.NewDecoder(res.Body).Decode(&x)
-		log.Printf("%+v\n", x)
 
-		var vercelError VercelError
-		err = json.NewDecoder(res.Body).Decode(&vercelError)
-		if err != nil {
-			body, _ := ioutil.ReadAll(req.Body)
-			return nil, fmt.Errorf("Request was not successfull [ %s ]\nI could not unmarshal the response body: %w.\nRequest was: %+v.\nRaw request body was: %s", res.Status, err, req.URL, string(body))
-		}
-		return nil, fmt.Errorf("Error during http request: [ %s ] - %s", vercelError.Error.Code, vercelError.Error.Message)
+		// var vercelError VercelError
+		// err = json.NewDecoder(res.Body).Decode(&vercelError)
+		// if err != nil {
+		// 	return nil, fmt.Errorf("Error during http request: Unable to extract error: %w", err)
+
+		// }
+		return nil, fmt.Errorf("Error during http request: %+v", x)
 	}
 	return res, nil
 }
@@ -82,6 +79,11 @@ func (c *Api) Request(method string, path string, body interface{}) (*http.Respo
 	if err != nil {
 		return nil, err
 	}
-	return c.do(req)
+	res, err := c.do(req)
+
+	if err != nil {
+		return &http.Response{}, fmt.Errorf("Unable to request resource: [%s] %s with payload {%+v}: %w", method, path, payload, err)
+	}
+	return res, nil
 
 }
