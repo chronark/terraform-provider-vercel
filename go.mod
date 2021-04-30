@@ -8,4 +8,5 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.4.4
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.6.1
+	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887 // indirect
 )

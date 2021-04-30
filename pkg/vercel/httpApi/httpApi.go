@@ -61,7 +61,7 @@ func (c *Api) do(req *http.Request) (*http.Response, error) {
 		err = json.NewDecoder(res.Body).Decode(&vercelError)
 		if err != nil {
 			body, _ := ioutil.ReadAll(req.Body)
-			return nil, fmt.Errorf("Request was not successfull [ %s ]\nI could not unmarshal the response body: %w.\nRequest was: %+v.\nRaw request body was: %s", res.Status, err, req.URL, string(body))
+			return nil, fmt.Errorf("Request was not successfull [ %s ]\nI could not unmarshal the response body: %w.\nRequest was: %+v\nRaw request body was: %s", res.Status, err, req.URL, string(body))
 		}
 		return nil, fmt.Errorf("Error during http request: [ %s ] - %s", vercelError.Error.Code, vercelError.Error.Message)
 	}
@@ -72,6 +72,10 @@ func (c *Api) Request(method string, path string, body interface{}) (*http.Respo
 	var payload io.Reader = nil
 	if body != nil {
 		b, err := json.Marshal(body)
+		if true {
+
+			panic(fmt.Sprintf("%+v", string(b)))
+		}
 		if err != nil {
 			return nil, err
 		}

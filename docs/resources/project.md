@@ -27,7 +27,6 @@ resource "vercel_project" "my_project" {
 
 ### Required
 
-- **git_repository** (Block List, Min: 1, Max: 1) The git repository that will be connected to the project. Any pushes to the specified connected git repository will be automatically deployed. (see [below for nested schema](#nestedblock--git_repository))
 - **name** (String) The name of the project.
 
 ### Optional
@@ -36,6 +35,7 @@ resource "vercel_project" "my_project" {
 - **build_command** (String) The build command for this project. When null is used this value will be automatically detected.
 - **dev_command** (String) The dev command for this project. When null is used this value will be automatically detected.
 - **framework** (String) The framework that is being used for this project. When null is used no framework is selected.
+- **git_repository** (Block List, Max: 1) The git repository that will be connected to the project. Any pushes to the specified connected git repository will be automatically deployed. (see [below for nested schema](#nestedblock--git_repository))
 - **install_command** (String) The install command for this project. When null is used this value will be automatically detected.
 - **node_version** (String) The Node.js Version for this project.
 - **output_directory** (String) The output directory of the project. When null is used this value will be automatically detected.

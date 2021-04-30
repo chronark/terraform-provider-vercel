@@ -3,8 +3,9 @@ default: testacc
 # Run acceptance tests
 .PHONY: testacc
 testacc:
-	@# go get github.com/mfridman/tparse
-	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m  -race -covermode=atomic  -json | tparse -all -dump
+	@go get github.com/mfridman/tparse
+	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m  -race -covermode=atomic
+	# -json | tparse -all -dump
 
 test:
 	go test ./... -v
@@ -29,7 +30,7 @@ rm-state:
 init: build
 	rm -rf examples/e2e/.terraform*
 	terraform -chdir=examples/e2e init -upgrade
-apply: 
+apply: init
 	terraform -chdir=examples/e2e apply
 
 

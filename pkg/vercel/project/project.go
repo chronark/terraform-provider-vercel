@@ -10,7 +10,7 @@ type ProjectHandler struct {
 	Api httpApi.API
 }
 
-func (p *ProjectHandler) Create(project CreateProject, teamId string) (string, error) {
+func (p *ProjectHandler) Create(project CreateOrUpdateProject, teamId string) (string, error) {
 	url := "/v6/projects"
 	if teamId != "" {
 		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
@@ -48,7 +48,7 @@ func (p *ProjectHandler) Read(id string, teamId string) (project Project, err er
 	}
 	return project, nil
 }
-func (p *ProjectHandler) Update(id string, project UpdateProject, teamId string) error {
+func (p *ProjectHandler) Update(id string, project CreateOrUpdateProject, teamId string) error {
 	url := fmt.Sprintf("/v2/projects/%s", id)
 	if teamId != "" {
 		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)

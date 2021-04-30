@@ -38,7 +38,7 @@ func resourceProject() *schema.Resource {
 			},
 			"git_repository": {
 				Description: "The git repository that will be connected to the project. Any pushes to the specified connected git repository will be automatically deployed.",
-				Required:    true,
+				Optional:    true,
 				ForceNew:    true,
 				Type:        schema.TypeList,
 				MaxItems:    1,
@@ -138,60 +138,61 @@ func resourceProject() *schema.Resource {
 func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	client := meta.(*vercel.Client)
+	proj := project.CreateOrUpdateProject{
+		Name: d.Get("name").(string),
+	}
 	// Terraform does not have nested objects with different types yet, so I am using a `TypeList`
 	// Here we have to typecast to list first and then take the first item and cast again.
-	repo := d.Get("git_repository").([]interface{})[0].(map[string]interface{})
-	project := project.CreateProject{
-		Name: d.Get("name").(string),
-		GitRepository: struct {
-			Type string `json:"type"`
-			Repo string `json:"repo"`
-		}{
+	repo, repoSet := d.GetOk("git_repository")
+	if repoSet {
+		repo := repo.([]interface{})[0].(map[string]interface{})
+
+		proj.GitRepository = project.GitRepository{
 			Type: repo["type"].(string),
 			Repo: repo["repo"].(string),
-		},
+		}
 	}
 
 	framework, frameworkSet := d.GetOk("framework")
 	if frameworkSet {
-		project.Framework = framework.(string)
+		proj.Framework = framework.(string)
 	}
 	publicSource, publicSourceSet := d.GetOk("public_source")
 	if publicSourceSet {
-		project.PublicSource = publicSource.(bool)
+		proj.PublicSource = publicSource.(bool)
 	}
 	installCommand, installCommandSet := d.GetOk("install_command")
 	if installCommandSet {
-		project.InstallCommand = installCommand.(string)
+		proj.InstallCommand = installCommand.(string)
 	}
 	buildCommand, buildCommandSet := d.GetOk("build_command")
 	if buildCommandSet {
-		project.BuildCommand = buildCommand.(string)
+		proj.BuildCommand = buildCommand.(string)
 	}
 	devCommand, devCommandSet := d.GetOk("dev_command")
 	if devCommandSet {
-		project.DevCommand = devCommand.(string)
+		proj.DevCommand = devCommand.(string)
 	}
 	outputDirectory, outputDirectorySet := d.GetOk("output_directory")
 	if outputDirectorySet {
-		project.OutputDirectory = outputDirectory.(string)
+		proj.OutputDirectory = outputDirectory.(string)
 	}
 
 	serverlessFunctionRegion, serverlessFunctionRegionSet := d.GetOk("serverless_function_region")
 	if serverlessFunctionRegionSet {
-		project.ServerlessFunctionRegion = serverlessFunctionRegion.(string)
+		proj.ServerlessFunctionRegion = serverlessFunctionRegion.(string)
 	}
 	rootDirectory, rootDirectorySet := d.GetOk("root_directory")
 	if rootDirectorySet {
-		project.RootDirectory = rootDirectory.(string)
+		proj.RootDirectory = rootDirectory.(string)
 	}
 	nodeVersion, nodeVersionSet := d.GetOk("node_version")
 	if nodeVersionSet {
-		project.NodeVersion = nodeVersion.(string)
+		proj.NodeVersion = nodeVersion.(string)
 
 	}
 
-	id, err := client.Project.Create(project, d.Get("team_id").(string))
+	id, err := client.Project.Create(proj, d.Get("team_id").(string))
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -282,7 +283,7 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	client := meta.(*vercel.Client)
-	var update project.UpdateProject
+	var update project.CreateOrUpdateProject
 
 	if d.HasChange("name") {
 		update.Name = d.Get("name").(string)

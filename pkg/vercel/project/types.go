@@ -172,19 +172,17 @@ type Project struct {
 	} `json:"targets"`
 }
 
-// CreateProject has all the fields the user can set when creating a new project
-type CreateProject struct {
-	Name          string `json:"name"`
-	GitRepository struct {
-		Type string `json:"type"`
-		Repo string `json:"repo"`
-	} `json:"gitRepository,omitempty"`
-	UpdateProject
+type GitRepository struct {
+	Type string `json:"type,omitempty"`
+	Repo string `json:"repo,omitempty"`
 }
 
-// UpdateProject has all the values a user can update without recreating a project
-// https://vercel.com/docs/api#endpoints/projects/update-a-single-project
-type UpdateProject struct {
+// CreateProject has all the fields the user can set when creating a new project
+type CreateOrUpdateProject struct {
+	// A new name for this project.
+	Name string `json:"name,omitempty"`
+
+	GitRepository GitRepository `json:"gitRepository,omitempty"`
 	// The framework that is being used for this project. When null is used no framework is selected.
 	Framework string `json:"framework,omitempty"`
 
@@ -208,9 +206,6 @@ type UpdateProject struct {
 
 	// The name of a directory or relative path to the source code of your project. When null is used it will default to the project root.
 	RootDirectory string `json:"rootDirectory,omitempty"`
-
-	// A new name for this project.
-	Name string `json:"name,omitempty"`
 
 	// The Node.js Version for this project.
 	NodeVersion string `json:"nodeVersion,omitempty"`
