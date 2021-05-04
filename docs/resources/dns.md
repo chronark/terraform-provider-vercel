@@ -10,10 +10,10 @@ description: |-
 # vercel_dns (Resource)
 
 https://vercel.com/docs/api#endpoints/dns
-<<<<<<< HEAD
-=======
 Currently this will only fetch the last 1000 records. Please create an issue if you require more.
+
 ## Example Usage
+
 ```terraform
 resource "vercel_domain" "chronark_com" {
   name = "chronark.com"
