@@ -10,7 +10,7 @@ import (
 
 func resourceDNS() *schema.Resource {
 	return &schema.Resource{
-		Description: "https://vercel.com/docs/api#endpoints/dns",
+		Description: "https://vercel.com/docs/api#endpoints/dns\nCurrently this can only fetch the last 1000 records. Please create an issue if you require more.",
 
 		CreateContext: resourceDNSCreate,
 		ReadContext:   resourceDNSRead,
