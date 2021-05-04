@@ -3,7 +3,6 @@ package alias
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/httpApi"
@@ -15,11 +14,14 @@ type CreateOrUpdateAlias struct {
 }
 
 type Alias struct {
+	ConfiguredBy        string `json:"configuredBy"`
+	ConfiguredChangedAt int    `json:"configuredChangedAt"`
+	GitBranch           string `json:"gitBranch"`
+	ProjectId           string `json:"projectId"`
 	CreatedAt           int64  `json:"createdAt"`
 	Domain              string `json:"domain"`
-	Target              string `json:"target"`
-	ConfiguredBy        string `json:"configuredBy"`
-	ConfiguredChangedAt int64  `json:"configuredChangedAt"`
+	Redirect            string `json:"redirect"`
+	RedirectStatusCode  int    `json:"redirectStatusCode"`
 }
 
 type Handler struct {
@@ -42,9 +44,38 @@ func (h *Handler) Create(projectId string, alias CreateOrUpdateAlias, teamId str
 	if err != nil {
 		return err
 	}
-	log.Printf("%+v\n\n", createdAliases)
-
 	return nil
+}
+
+func (h *Handler) Read(projectId string, domain, teamId string) (Alias, error) {
+	url := fmt.Sprintf("/v1/projects/%s", projectId)
+	if teamId != "" {
+		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+	}
+
+	res, err := h.Api.Request("GET", url, nil)
+	if err != nil {
+		return Alias{}, fmt.Errorf("Unable to fetch project from vercel: %w", err)
+	}
+	defer res.Body.Close()
+	type Project struct {
+		Aliases []Alias `json:"alias"`
+	}
+	project := Project{}
+
+	err = json.NewDecoder(res.Body).Decode(&project)
+	if err != nil {
+
+		return Alias{}, fmt.Errorf("Unable to unmarshal response from %s: %w", url, err)
+	}
+
+	for _, alias := range project.Aliases {
+		if alias.Domain == domain {
+			return alias, nil
+		}
+	}
+
+	return Alias{}, fmt.Errorf("No alias with domain: %s found", domain)
 }
 
 func (h *Handler) Update(projectId string, alias CreateOrUpdateAlias, teamId string) error {
@@ -60,10 +91,10 @@ func (h *Handler) Update(projectId string, alias CreateOrUpdateAlias, teamId str
 	defer res.Body.Close()
 	return nil
 }
-func (h *Handler) Delete(projectId, envKey string, teamId string) error {
-	url := fmt.Sprintf("/v1/projects/%s/alias?domain", projectId)
+func (h *Handler) Delete(projectId, domain string, teamId string) error {
+	url := fmt.Sprintf("/v1/projects/%s/alias?domain=%s", projectId, domain)
 	if teamId != "" {
-		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+		url = fmt.Sprintf("%s&teamId=%s", url, teamId)
 	}
 	res, err := h.Api.Request("DELETE", url, nil)
 	if err != nil {

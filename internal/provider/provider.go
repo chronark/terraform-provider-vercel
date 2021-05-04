@@ -46,6 +46,7 @@ func New(version string) func() *schema.Provider {
 				"vercel_secret":  resourceSecret(),
 				"vercel_domain":  resourceDomain(),
 				"vercel_dns":     resourceDNS(),
+				"vercel_alias":   resourceAlias(),
 			},
 		}
 

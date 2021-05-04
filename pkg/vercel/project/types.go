@@ -1,58 +1,14 @@
 package project
 
-import "github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
+import (
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel/alias"
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
+)
 
 // Project houses all the information vercel offers about a project via their api
 type Project struct {
-	AccountID string `json:"accountId"`
-	Alias     []struct {
-		ConfiguredBy        string `json:"configuredBy"`
-		ConfiguredChangedAt int64  `json:"configuredChangedAt"`
-		CreatedAt           int64  `json:"createdAt"`
-		Deployment          struct {
-			Alias         []string      `json:"alias"`
-			AliasAssigned int64         `json:"aliasAssigned"`
-			Builds        []interface{} `json:"builds"`
-			CreatedAt     int64         `json:"createdAt"`
-			CreatedIn     string        `json:"createdIn"`
-			Creator       struct {
-				UID         string `json:"uid"`
-				Email       string `json:"email"`
-				Username    string `json:"username"`
-				GithubLogin string `json:"githubLogin"`
-			} `json:"creator"`
-			DeploymentHostname string `json:"deploymentHostname"`
-			Forced             bool   `json:"forced"`
-			ID                 string `json:"id"`
-			Meta               struct {
-				GithubCommitRef         string `json:"githubCommitRef"`
-				GithubRepo              string `json:"githubRepo"`
-				GithubOrg               string `json:"githubOrg"`
-				GithubCommitSha         string `json:"githubCommitSha"`
-				GithubRepoID            string `json:"githubRepoId"`
-				GithubCommitMessage     string `json:"githubCommitMessage"`
-				GithubCommitAuthorLogin string `json:"githubCommitAuthorLogin"`
-				GithubDeployment        string `json:"githubDeployment"`
-				GithubCommitOrg         string `json:"githubCommitOrg"`
-				GithubCommitAuthorName  string `json:"githubCommitAuthorName"`
-				GithubCommitRepo        string `json:"githubCommitRepo"`
-				GithubCommitRepoID      string `json:"githubCommitRepoId"`
-			} `json:"meta"`
-			Name       string `json:"name"`
-			Plan       string `json:"plan"`
-			Private    bool   `json:"private"`
-			ReadyState string `json:"readyState"`
-			Target     string `json:"target"`
-			TeamID     string `json:"teamId"`
-			Type       string `json:"type"`
-			URL        string `json:"url"`
-			UserID     string `json:"userId"`
-			WithCache  bool   `json:"withCache"`
-		} `json:"deployment"`
-		Domain      string `json:"domain"`
-		Environment string `json:"environment"`
-		Target      string `json:"target"`
-	} `json:"alias"`
+	AccountID string        `json:"accountId"`
+	Aliases   []alias.Alias `json:"alias"`
 	Analytics struct {
 		ID         string `json:"id"`
 		EnabledAt  int64  `json:"enabledAt"`
