@@ -268,8 +268,8 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 	}
 
 	aliases := make([]string, 0)
-	for i := 0; i < len(project.Alias); i++ {
-		aliases = append(aliases, project.Alias[i].Domain)
+	for i := 0; i < len(project.Aliases); i++ {
+		aliases = append(aliases, project.Aliases[i].Domain)
 	}
 	err = d.Set("alias", aliases)
 	if err != nil {
