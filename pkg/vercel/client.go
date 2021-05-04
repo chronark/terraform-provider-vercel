@@ -5,6 +5,7 @@ import (
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/httpApi"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/alias"
+	"github.com/chronark/terraform-provider-vercel/pkg/vercel/dns"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/domain"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/secret"
@@ -20,6 +21,7 @@ type Client struct {
 	Team    *team.Handler
 	Alias   *alias.Handler
 	Domain  *domain.Handler
+	DNS     *dns.Handler
 }
 
 func New(token string) *Client {
@@ -37,5 +39,6 @@ func New(token string) *Client {
 		Team:   &team.Handler{Api: api},
 		Alias:  &alias.Handler{Api: api},
 		Domain: &domain.Handler{Api: api},
+		DNS:    &dns.Handler{Api: api},
 	}
 }
