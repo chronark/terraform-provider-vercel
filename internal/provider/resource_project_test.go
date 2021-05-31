@@ -173,7 +173,7 @@ func testAccCheckVercelProjectConfig(name string, repo string) string {
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "%s"
+			repo = "chronark/%s"
 		}
 	}
 	`, name, repo)
@@ -185,7 +185,7 @@ func testAccCheckVercelProjectConfigWithOverridenCommands(name string, repo stri
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "%s"
+			repo = "chronark/%s"
 		}
 		install_command  = "echo install"
 		build_command 	 = "echo build"
