@@ -3,7 +3,7 @@ module github.com/chronark/terraform-provider-vercel
 go 1.15
 
 require (
-	github.com/caarlos0/svu v1.3.2 // indirect
+	github.com/caarlos0/svu v1.4.1 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/hashicorp/go-uuid v1.0.1
 	github.com/hashicorp/terraform-plugin-docs v0.4.0
