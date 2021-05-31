@@ -10,7 +10,7 @@ import (
 
 func resourceDomain() *schema.Resource {
 	return &schema.Resource{
-		Description: "https://vercel.com/docs/api#endpoints/projects/get-project-environment-variables",
+		Description: "Creates account wide domains to be used in your projects.",
 
 		CreateContext: resourceDomainCreate,
 		ReadContext:   resourceDomainRead,
