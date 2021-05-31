@@ -172,7 +172,7 @@ func testAccCheckVercelProjectConfig(name string) string {
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "chronark/mercury"
+			repo = "chronark/terraform-provider-vercel"
 		}
 	}
 	`, name)
@@ -184,7 +184,7 @@ func testAccCheckVercelProjectConfigWithOverridenCommands(name string) string {
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "chronark/mercury"
+			repo = "chronark/terraform-provider-vercel"
 		}
 		install_command  = "echo install"
 		build_command 	 = "echo build"
