@@ -37,7 +37,7 @@ type Handler struct {
 }
 
 func (h *Handler) Create(name string, teamId string) (string, error) {
-	url := "/v4/domains"
+	url := "/v5/domains"
 	if teamId != "" {
 		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
 	}
