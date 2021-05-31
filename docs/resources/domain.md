@@ -3,12 +3,12 @@
 page_title: "vercel_domain Resource - terraform-provider-vercel"
 subcategory: ""
 description: |-
-  https://vercel.com/docs/api#endpoints/projects/get-project-environment-variables
+  Creates account wide domains to be used in your projects.
 ---
 
 # vercel_domain (Resource)
 
-https://vercel.com/docs/api#endpoints/projects/get-project-environment-variables
+Creates account wide domains to be used in your projects.
 
 ## Example Usage
 
