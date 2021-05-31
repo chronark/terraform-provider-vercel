@@ -11,6 +11,15 @@ Configure vercel resources such as projects, deployments and secrets as code wit
   <img src="https://codecov.io/gh/chronark/terraform-provider-vercel/branch/main/graph/badge.svg?token=pBJrBYgr9g"/>
 </a></div>
 
+
+
+## Features
+
+This provider has not reached feauture parity with the vercel api yet. I am adding new features as I need them.
+Please create an issue if you requrie a certain feature, I will work on them asap.
+
+Available features can be found [here](https://registry.terraform.io/providers/chronark/vercel/latest/docs).
+
 ## Quickstart
 
 1. Create a token [here](https://vercel.com/account/tokens)
