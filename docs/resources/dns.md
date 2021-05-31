@@ -4,11 +4,13 @@ page_title: "vercel_dns Resource - terraform-provider-vercel"
 subcategory: ""
 description: |-
   https://vercel.com/docs/api#endpoints/dns
+  Currently this can only fetch the last 1000 records. Please create an issue if you require more.
 ---
 
 # vercel_dns (Resource)
 
 https://vercel.com/docs/api#endpoints/dns
+Currently this can only fetch the last 1000 records. Please create an issue if you require more.
 
 ## Example Usage
 
