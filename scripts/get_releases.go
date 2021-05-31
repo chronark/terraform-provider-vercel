@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -15,23 +15,41 @@ type Release struct {
 func main() {
 	res, err := http.Get("https://api.github.com/repos/hashicorp/terraform/releases")
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
 	releases := []Release{}
 
 	err = json.NewDecoder(res.Body).Decode(&releases)
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
-	versions := make([]string, len(releases))
+	testVersions := make([]string, 0)
 
-	for i, release := range releases {
-		versions[i] = strings.TrimLeft(release.Tag, "v")
+	for _, release := range releases {
+		split := strings.Split(strings.Trim(release.Tag, "v"), ".")
+
+		major, err := strconv.Atoi(split[0])
+		if err != nil {
+			panic(err)
+		}
+		minor, err := strconv.Atoi(split[1])
+		if err != nil {
+			panic(err)
+		}
+		if major >= 0 && minor >= 15 {
+			testVersions = append(testVersions, strings.TrimLeft(release.Tag, "v"))
+		}
+
 	}
+	// Manually add some more versions
+	testVersions = append(testVersions, "0.14.11")
+	testVersions = append(testVersions, "0.13.7")
 
-
-	json.NewEncoder(os.Stdout).Encode(versions)
+	err = json.NewEncoder(os.Stdout).Encode(testVersions)
+	if err != nil {
+		panic(err)
+	}
 
 }
