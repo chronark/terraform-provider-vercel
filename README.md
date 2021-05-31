@@ -22,8 +22,8 @@ Configure vercel resources such as projects, deployments and secrets as code wit
 terraform {
   required_providers {
     vercel = {
-      source  = "hashicorp.com/chronark/vercel"
-      version = "1.0.0"
+      source  = "chronark/vercel"
+      version = "0.10.0"
     }
   }
 }
