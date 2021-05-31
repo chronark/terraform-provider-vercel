@@ -58,7 +58,7 @@ func (h *Handler) Create(name string, teamId string) (string, error) {
 
 // Read returns metadata about a domain
 func (h *Handler) Read(domainName string, teamId string) (domain Domain, err error) {
-	url := fmt.Sprintf("/v4/domains/%s", domainName)
+	url := fmt.Sprintf("/v5/domains/%s", domainName)
 	if teamId != "" {
 		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
 	}
@@ -82,7 +82,7 @@ func (h *Handler) Read(domainName string, teamId string) (domain Domain, err err
 }
 
 func (h *Handler) Delete(domainName string, teamId string) error {
-	url := fmt.Sprintf("/v4/domains/%s", domainName)
+	url := fmt.Sprintf("/v5/domains/%s", domainName)
 	if teamId != "" {
 		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
 	}
