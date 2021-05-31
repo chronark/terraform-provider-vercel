@@ -10,5 +10,8 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.4.4
 	github.com/mfridman/tparse v0.8.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/stamblerre/gocode v1.0.0 // indirect
 	github.com/stretchr/testify v1.6.1
+	github.com/uudashr/gopkgs/v2 v2.1.2 // indirect
+	golang.org/x/tools/gopls v0.6.11 // indirect
 )
