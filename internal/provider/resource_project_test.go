@@ -15,7 +15,6 @@ func TestAccVercelProject(t *testing.T) {
 
 	projectName, _ := uuid.GenerateUUID()
 	updatedProjectName, _ := uuid.GenerateUUID()
-	repo, _ := uuid.GenerateUUID()
 	var (
 
 		// Holds the project fetched from vercel when we create it at the beginning
@@ -33,7 +32,7 @@ func TestAccVercelProject(t *testing.T) {
 		CheckDestroy:      testAccCheckVercelProjectDestroy(projectName),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckVercelProjectConfig(projectName, repo),
+				Config: testAccCheckVercelProjectConfig(projectName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckProjectStateHasValues(
 						"vercel_project.new", project.Project{Name: projectName},
@@ -43,7 +42,7 @@ func TestAccVercelProject(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckVercelProjectConfig(updatedProjectName, repo),
+				Config: testAccCheckVercelProjectConfig(updatedProjectName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVercelProjectExists("vercel_project.new", &actualProjectAfterUpdate),
 					testAccCheckProjectStateHasValues(
@@ -54,7 +53,7 @@ func TestAccVercelProject(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckVercelProjectConfigWithOverridenCommands(projectName, repo),
+				Config: testAccCheckVercelProjectConfigWithOverridenCommands(projectName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVercelProjectExists("vercel_project.new", &actualProject),
 					testAccCheckProjectStateHasValues(
@@ -167,32 +166,32 @@ func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 	}
 
 }
-func testAccCheckVercelProjectConfig(name string, repo string) string {
+func testAccCheckVercelProjectConfig(name string) string {
 	return fmt.Sprintf(`
 	resource "vercel_project" "new" {
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "chronark/%s"
+			repo = "chronark/terraform-provider-vercel"
 		}
 	}
-	`, name, repo)
+	`, name)
 }
 
-func testAccCheckVercelProjectConfigWithOverridenCommands(name string, repo string) string {
+func testAccCheckVercelProjectConfigWithOverridenCommands(name string) string {
 	return fmt.Sprintf(`
 	resource "vercel_project" "new" {
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "chronark/%s"
+			repo = "chronark/terraform-provider-vercel"
 		}
 		install_command  = "echo install"
 		build_command 	 = "echo build"
 		dev_command 	 = "echo dev"
 		output_directory = "out"
 	}
-	`, name, repo)
+	`, name)
 }
 
 func testAccCheckVercelProjectExists(n string, actual *project.Project) resource.TestCheckFunc {
