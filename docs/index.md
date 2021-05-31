@@ -23,8 +23,6 @@ terraform {
 }
 
 provider "vercel" {
-  // You can omit the token here and it will be picked up from the 
-  // `VERCEL_TOKEN` environment variable.
   token = "<YOUR_TOKEN>"
 }
 ```
