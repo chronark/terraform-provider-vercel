@@ -15,7 +15,7 @@ Configure vercel resources such as projects, deployments and secrets as code wit
 
 1. Create a token [here](https://vercel.com/account/tokens)
 2. Create a `vercel.tf` file with the following content. 
-    - Replace `<YOUR_TOKEN>` with the token from step 1.
+    - Replace `<YOUR_TOKEN>` with the token from step 1. Alternatively you can set the `VERCEL_TOKEN` environment variable
     - Change the `git_repository` to whatever you want to deploy.
 
 ```tf
