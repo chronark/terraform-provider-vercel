@@ -46,12 +46,27 @@ jobs:
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2.3.3
-     
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
 
+  getReleases:
+    name: Get terraform releases
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2.1.3
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2.3.3
+
+      - name: getReleases
+        id: set-matrix
+        run: echo "::set-output name=matrix::$(go run ./scripts/get_releases.go)"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
   # run acceptance tests in a matrix with Terraform core versions
   test:
@@ -59,18 +74,14 @@ jobs:
     needs:
       - build
       - lint
+      - getReleases
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
       max-parallel: 1
       fail-fast: false
       matrix:
-        # list whatever Terraform versions here you would like to support
-        terraform:
-          - "0.13.6"
-          - "0.14.9"
-          - "0.15.0-beta2"
-          - "" # latest
+        terraform: ${{fromJson(needs.getReleases.outputs.matrix)}}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v2.1.3
@@ -91,7 +102,7 @@ jobs:
           TF_ACC: "1"
           TF_ACC_TERRAFORM_VERSION: ${{ matrix.terraform }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-    
+
         run: |
           go test -v ./...
 
