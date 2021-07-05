@@ -31,8 +31,8 @@ Available features can be found [here](https://registry.terraform.io/providers/c
 terraform {
   required_providers {
     vercel = {
-      source  = "hashicorp.com/chronark/vercel"
-      version = "1.0.0"
+      source  = "registry.terraform.io/chronark/vercel"
+      version = ">=0.10.3"
     }
   }
 }
