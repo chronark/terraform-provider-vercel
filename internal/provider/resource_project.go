@@ -2,6 +2,8 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/util"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
@@ -18,6 +20,10 @@ func resourceProject() *schema.Resource {
 		ReadContext:   resourceProjectRead,
 		UpdateContext: resourceProjectUpdate,
 		DeleteContext: resourceProjectDelete,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceProjectImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -163,6 +169,17 @@ func resourceProject() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	// TODO: need to escape the slash inside project and team names?
+	parts := strings.Split(d.Id(), "/")
+	if len(parts) > 1 {
+		teamID, projectID := parts[0], parts[1]
+		d.Set("team_id", teamID)
+		d.SetId(projectID)
+	}
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -318,6 +335,17 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 		aliases = append(aliases, project.Alias[i].Domain)
 	}
 	err = d.Set("alias", aliases)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	gitRepository := make([]map[string]interface{}, 1)
+	gitRepository[0] = map[string]interface{}{
+		"type": project.Link.Type,
+		// TODO: this works for the gitlab type. need to support other repo types
+		"repo": fmt.Sprintf("%s/%s", project.Link.ProjectNamespace, project.Link.ProjectName),
+	}
+	err = d.Set("git_repository", gitRepository)
 	if err != nil {
 		return diag.FromErr(err)
 	}

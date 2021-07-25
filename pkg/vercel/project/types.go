@@ -94,6 +94,8 @@ type Project struct {
 		Sourceless       bool          `json:"sourceless"`
 		ProductionBranch string        `json:"productionBranch"`
 		DeployHooks      []interface{} `json:"deployHooks"`
+		ProjectName      string        `json:"projectName"`
+		ProjectNamespace string        `json:"projectNamespace"`
 	} `json:"link"`
 	LatestDeployments []struct {
 		Alias         []string      `json:"alias"`
