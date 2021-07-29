@@ -342,9 +342,17 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 	gitRepository := make([]map[string]interface{}, 1)
 	gitRepository[0] = map[string]interface{}{
 		"type": project.Link.Type,
-		// TODO: this works for the gitlab type. need to support other repo types
-		"repo": fmt.Sprintf("%s/%s", project.Link.ProjectNamespace, project.Link.ProjectName),
 	}
+	switch project.Link.Type {
+	case "gitlab":
+		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.ProjectNamespace, project.Link.ProjectName)
+	case "github":
+		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.Org, project.Link.Repo)
+	default:
+		return diag.Errorf("Can't recognize '%s' repository type", project.Link.Type)
+		// TODO: bitbucket
+	}
+
 	err = d.Set("git_repository", gitRepository)
 	if err != nil {
 		return diag.FromErr(err)
