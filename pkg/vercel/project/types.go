@@ -96,6 +96,8 @@ type Project struct {
 		DeployHooks      []interface{} `json:"deployHooks"`
 		ProjectName      string        `json:"projectName"`
 		ProjectNamespace string        `json:"projectNamespace"`
+		Owner            string        `json:"owner"`
+		Slug             string        `json:"slug"`
 	} `json:"link"`
 	LatestDeployments []struct {
 		Alias         []string      `json:"alias"`

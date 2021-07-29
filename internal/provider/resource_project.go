@@ -348,9 +348,10 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.ProjectNamespace, project.Link.ProjectName)
 	case "github":
 		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.Org, project.Link.Repo)
+	case "bitbucket":
+		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.Owner, project.Link.Slug)
 	default:
 		return diag.Errorf("Can't recognize '%s' repository type", project.Link.Type)
-		// TODO: bitbucket
 	}
 
 	err = d.Set("git_repository", gitRepository)
