@@ -183,7 +183,12 @@ func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, m i
 		if err != nil {
 			return []*schema.ResourceData{}, err
 		}
-		d.Set("team_id", teamID)
+
+		err = d.Set("team_id", teamID)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
 		projectID, err = url.QueryUnescape(parts[1])
 		if err != nil {
 			return []*schema.ResourceData{}, err
