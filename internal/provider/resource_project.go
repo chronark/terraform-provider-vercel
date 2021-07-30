@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/util"
@@ -172,13 +173,23 @@ func resourceProject() *schema.Resource {
 }
 
 func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	// TODO: need to escape the slash inside project and team names?
+	projectID, err := url.QueryUnescape(d.Id())
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
 	parts := strings.Split(d.Id(), "/")
 	if len(parts) > 1 {
-		teamID, projectID := parts[0], parts[1]
+		teamID, err := url.QueryUnescape(parts[0])
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
 		d.Set("team_id", teamID)
-		d.SetId(projectID)
+		projectID, err = url.QueryUnescape(parts[1])
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
 	}
+	d.SetId(projectID)
 	return []*schema.ResourceData{d}, nil
 }
 

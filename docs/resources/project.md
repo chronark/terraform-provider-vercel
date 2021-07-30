@@ -60,7 +60,6 @@ Required:
 - **repo** (String) The name of the git repository. For example: `chronark/terraform-provider-vercel`
 - **type** (String) The git provider of the repository. Must be either `github`, `gitlab`, or `bitbucket`.
 
-
 <a id="nestedblock--domain"></a>
 ### Nested Schema for `domain`
 
@@ -75,3 +74,18 @@ Optional:
 - **redirect_status_code** (Number) The redirect status code (301, 302, 307, 308).
 
 
+## Importing
+
+Use the Vercel `projectID`, e.g:
+
+```
+$ terraform import vercel_project.app prj_qgfWWlgVzRgIkrGVjhDi6ovmmsx8
+```
+
+For team projects, prefix the project id with the team id followed by a slash (`/`), e.g:
+
+```
+$ terraform impot vercel_project.team_app team_y4tZByVi8ZSPSvHGptjP21Lu/prj_caqJd29Md3VVCUQogqsBgeSNPSJO
+```
+
+Slashes in the project or team IDs may be URL-escaped (percent-encoded) if needed.
