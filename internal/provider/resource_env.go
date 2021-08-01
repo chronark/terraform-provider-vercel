@@ -2,6 +2,10 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -16,6 +20,10 @@ func resourceEnv() *schema.Resource {
 		ReadContext:   resourceEnvRead,
 		UpdateContext: resourceEnvUpdate,
 		DeleteContext: resourceEnvDelete,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceEnvImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project_id": {
@@ -71,6 +79,58 @@ func resourceEnv() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceEnvImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.Split(d.Id(), "/")
+	if len(parts) < 2 {
+		return []*schema.ResourceData{}, fmt.Errorf("Invalid import ID (use project_id/VARIABLE_NAME")
+	}
+
+	projectID, err := url.QueryUnescape(parts[0])
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+
+	err = d.Set("project_id", projectID)
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+
+	key, err := url.QueryUnescape(parts[1])
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+
+	teamID := ""
+	if len(parts) > 2 {
+		teamID, projectID = projectID, key
+		key, err = url.QueryUnescape(parts[2])
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+	}
+
+	client := meta.(*vercel.Client)
+
+	allEnvVariables, err := client.Env.Read(projectID, teamID)
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+
+	// Filter the current variable out of all existing ones
+	for _, envVar := range allEnvVariables {
+		if envVar.Key == key {
+			d.SetId(envVar.ID)
+			err = d.Set("project_id", projectID)
+			if err != nil {
+				return []*schema.ResourceData{}, err
+			}
+			return []*schema.ResourceData{d}, nil
+		}
+	}
+
+	return []*schema.ResourceData{d}, fmt.Errorf("No '%s' environment variable in project", key)
 }
 
 func toCreateOrUpdateEnv(d *schema.ResourceData) env.CreateOrUpdateEnv {

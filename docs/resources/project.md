@@ -85,7 +85,7 @@ $ terraform import vercel_project.app prj_qgfWWlgVzRgIkrGVjhDi6ovmmsx8
 For team projects, prefix the project id with the team id followed by a slash (`/`), e.g:
 
 ```
-$ terraform impot vercel_project.team_app team_y4tZByVi8ZSPSvHGptjP21Lu/prj_caqJd29Md3VVCUQogqsBgeSNPSJO
+$ terraform import vercel_project.team_app team_y4tZByVi8ZSPSvHGptjP21Lu/prj_caqJd29Md3VVCUQogqsBgeSNPSJO
 ```
 
 Slashes in the project or team IDs may be URL-escaped (percent-encoded) if needed.
