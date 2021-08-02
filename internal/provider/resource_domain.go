@@ -2,6 +2,8 @@ package provider
 
 import (
 	"context"
+	"net/url"
+	"strings"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -15,6 +17,10 @@ func resourceDomain() *schema.Resource {
 		CreateContext: resourceDomainCreate,
 		ReadContext:   resourceDomainRead,
 		DeleteContext: resourceDomainDelete,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceDomainImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"team_id": {
@@ -120,6 +126,35 @@ func resourceDomain() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceDomainImportState(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	domainName, err := url.QueryUnescape(d.Id())
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	parts := strings.Split(d.Id(), "/")
+	if len(parts) > 1 {
+		teamID, err := url.QueryUnescape(parts[0])
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		err = d.Set("team_id", teamID)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		domainName, err = url.QueryUnescape(parts[1])
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+	}
+	err = d.Set("name", domainName)
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceDomainCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
