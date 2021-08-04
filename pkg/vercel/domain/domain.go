@@ -39,7 +39,7 @@ type Handler struct {
 func (h *Handler) Create(name string, teamId string) (string, error) {
 	url := "/v5/domains"
 	if teamId != "" {
-		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+		url = fmt.Sprintf("%s?teamId=%s", url, teamId)
 	}
 	res, err := h.Api.Request(http.MethodPost, url, CreateDomain{Name: name})
 	if err != nil {
@@ -60,7 +60,7 @@ func (h *Handler) Create(name string, teamId string) (string, error) {
 func (h *Handler) Read(domainName string, teamId string) (domain Domain, err error) {
 	url := fmt.Sprintf("/v5/domains/%s", domainName)
 	if teamId != "" {
-		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+		url = fmt.Sprintf("%s?teamId=%s", url, teamId)
 	}
 
 	res, err := h.Api.Request("GET", url, nil)
@@ -84,7 +84,7 @@ func (h *Handler) Read(domainName string, teamId string) (domain Domain, err err
 func (h *Handler) Delete(domainName string, teamId string) error {
 	url := fmt.Sprintf("/v5/domains/%s", domainName)
 	if teamId != "" {
-		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+		url = fmt.Sprintf("%s?teamId=%s", url, teamId)
 	}
 	res, err := h.Api.Request("DELETE", url, nil)
 	if err != nil {
