@@ -2,6 +2,13 @@ package project
 
 import "github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
 
+type Domain struct {
+	Name string `json:"name"`
+	// Redirect           string `json:"redirect"`
+	// RedirectStatusCode int    `json:"redirectStatusCode"`
+	// GitBranch          string `json:"gitBranch"`
+}
+
 // Project houses all the information vercel offers about a project via their api
 type Project struct {
 	AccountID string `json:"accountId"`

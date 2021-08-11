@@ -35,6 +35,7 @@ resource "vercel_project" "my_project" {
 - **alias** (List of String) A list of production domains for the project.
 - **build_command** (String) The build command for this project. When null is used this value will be automatically detected.
 - **dev_command** (String) The dev command for this project. When null is used this value will be automatically detected.
+- **domain** (Block List, Max: 1) Add a domain to the project by passing the project. (see [below for nested schema](#nestedblock--domain))
 - **framework** (String) The framework that is being used for this project. When null is used no framework is selected.
 - **install_command** (String) The install command for this project. When null is used this value will be automatically detected.
 - **node_version** (String) The Node.js Version for this project.
@@ -58,5 +59,19 @@ Required:
 
 - **repo** (String) The name of the git repository. For example: `chronark/terraform-provider-vercel`
 - **type** (String) The git provider of the repository. Must be either `github`, `gitlab`, or `bitbucket`.
+
+
+<a id="nestedblock--domain"></a>
+### Nested Schema for `domain`
+
+Required:
+
+- **name** (String) The name of the production domain.
+
+Optional:
+
+- **git_branch** (String) it branch for the domain to be auto assigned to. The Project's production branch is the default (null).
+- **redirect** (String) Target destination domain for redirect.
+- **redirect_status_code** (Number) The redirect status code (301, 302, 307, 308).
 
 
