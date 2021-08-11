@@ -64,7 +64,7 @@ func (p *ProjectHandler) Update(id string, project UpdateProject, teamId string)
 func (p *ProjectHandler) Delete(id string, teamId string) error {
 	url := fmt.Sprintf("/v1/projects/%s", id)
 	if teamId != "" {
-		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
+		url = fmt.Sprintf("%s?teamId=%s", url, teamId)
 	}
 
 	res, err := p.Api.Request("DELETE", url, nil)
@@ -72,5 +72,41 @@ func (p *ProjectHandler) Delete(id string, teamId string) error {
 		return fmt.Errorf("Unable to delete project: %w", err)
 	}
 	defer res.Body.Close()
+	return nil
+}
+
+func (p *ProjectHandler) AddDomain(projectId string, domain Domain, teamId string) error {
+	url := fmt.Sprintf("/v8/projects/%s/domains", projectId)
+	if teamId != "" {
+		url = fmt.Sprintf("%s?teamId=%s", url, teamId)
+	}
+	res, err := p.Api.Request("POST", url, domain)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return fmt.Errorf("Unable to add domain")
+	}
+
+	return nil
+}
+
+func (p *ProjectHandler) RemoveDomain(projectId string, domain string, teamId string) error {
+	url := fmt.Sprintf("/v8/projects/%s/domains/%s", projectId, domain)
+	if teamId != "" {
+		url = fmt.Sprintf("%s?teamId=%s", url, teamId)
+	}
+	res, err := p.Api.Request("DELETE", url, domain)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return fmt.Errorf("Unable to add domain")
+	}
+
 	return nil
 }

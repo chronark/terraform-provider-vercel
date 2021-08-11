@@ -19,6 +19,10 @@ resource "vercel_project" "my_project" {
     repo = "chronark/mercury"
   }
 
+  domain {
+    name = "chronark.com"
+  }
+
 
 }
 

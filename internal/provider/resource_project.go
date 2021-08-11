@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
-	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
+	projectApi "github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -53,6 +53,35 @@ func resourceProject() *schema.Resource {
 							Description: "The name of the git repository. For example: `chronark/terraform-provider-vercel`",
 							Type:        schema.TypeString,
 							Required:    true,
+						},
+					},
+				},
+			},
+			"domain": {
+				Description: "Add a domain to the project by passing the project.",
+				Optional:    true,
+				Type:        schema.TypeList,
+				MaxItems:    1,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Description: "The name of the production domain.",
+							Type:        schema.TypeString,
+							Required:    true,
+						},
+						"redirect": {
+							Description: "Target destination domain for redirect.",
+							Type:        schema.TypeString,
+							Optional:    true,
+						}, "redirect_status_code": {
+							Description: "The redirect status code (301, 302, 307, 308).",
+							Type:        schema.TypeInt,
+							Optional:    true,
+						}, "git_branch": {
+							Description: "it branch for the domain to be auto assigned to. The Project's production branch is the default (null).",
+							Type:        schema.TypeString,
+							Optional:    true,
 						},
 					},
 				},
@@ -141,7 +170,7 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 	// Terraform does not have nested objects with different types yet, so I am using a `TypeList`
 	// Here we have to typecast to list first and then take the first item and cast again.
 	repo := d.Get("git_repository").([]interface{})[0].(map[string]interface{})
-	project := project.CreateProject{
+	project := projectApi.CreateProject{
 		Name: d.Get("name").(string),
 		GitRepository: struct {
 			Type string `json:"type"`
@@ -192,9 +221,25 @@ func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta int
 	}
 
 	id, err := client.Project.Create(project, d.Get("team_id").(string))
-
 	if err != nil {
 		return diag.FromErr(err)
+	}
+	// repo := d.Get("git_repository").([]interface{})[0].(map[string]interface{})
+
+	_, domainSet := d.GetOk("domain")
+	if domainSet {
+
+		rawDomain := d.Get("domain").([]interface{})[0].(map[string]interface{})
+		domain := projectApi.Domain{
+			Name: rawDomain["name"].(string),
+			// Redirect:           rawDomain["redirect"].(string),
+			// RedirectStatusCode: rawDomain["redirect_status_code"].(int),
+		}
+
+		err = client.Project.AddDomain(id, domain, d.Get("team_id").(string))
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	d.SetId(id)
@@ -282,7 +327,7 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	client := meta.(*vercel.Client)
-	var update project.UpdateProject
+	var update projectApi.UpdateProject
 
 	if d.HasChange("name") {
 		update.Name = d.Get("name").(string)
