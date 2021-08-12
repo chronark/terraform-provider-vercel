@@ -172,27 +172,35 @@ func resourceProject() *schema.Resource {
 	}
 }
 
+func partsFromID(id string) ([]string, error) {
+	parts := strings.Split(id, "/")
+	results := make([]string, len(parts))
+	for i, part := range parts {
+		result, err := url.QueryUnescape(part)
+		if err != nil {
+			return results, err
+		}
+
+		results[i] = result
+	}
+
+	return results, nil
+}
+
 func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	projectID, err := url.QueryUnescape(d.Id())
+	parts, err := partsFromID(d.Id())
 	if err != nil {
 		return []*schema.ResourceData{}, err
 	}
-	parts := strings.Split(d.Id(), "/")
+	projectID := parts[0]
 	if len(parts) > 1 {
-		teamID, err := url.QueryUnescape(parts[0])
-		if err != nil {
-			return []*schema.ResourceData{}, err
-		}
-
+		teamID := parts[0]
 		err = d.Set("team_id", teamID)
 		if err != nil {
 			return []*schema.ResourceData{}, err
 		}
 
-		projectID, err = url.QueryUnescape(parts[1])
-		if err != nil {
-			return []*schema.ResourceData{}, err
-		}
+		projectID = parts[1]
 	}
 	d.SetId(projectID)
 	return []*schema.ResourceData{d}, nil

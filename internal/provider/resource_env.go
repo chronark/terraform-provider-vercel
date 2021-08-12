@@ -3,8 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"net/url"
-	"strings"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
@@ -82,33 +80,20 @@ func resourceEnv() *schema.Resource {
 }
 
 func resourceEnvImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	parts := strings.Split(d.Id(), "/")
+	parts, err := partsFromID(d.Id())
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
 	if len(parts) < 2 {
 		return []*schema.ResourceData{}, fmt.Errorf("Invalid import ID (use project_id/VARIABLE_NAME")
 	}
 
-	projectID, err := url.QueryUnescape(parts[0])
-	if err != nil {
-		return []*schema.ResourceData{}, err
-	}
-
-	err = d.Set("project_id", projectID)
-	if err != nil {
-		return []*schema.ResourceData{}, err
-	}
-
-	key, err := url.QueryUnescape(parts[1])
-	if err != nil {
-		return []*schema.ResourceData{}, err
-	}
+	projectID, key := parts[0], parts[1]
 
 	teamID := ""
 	if len(parts) > 2 {
 		teamID, projectID = projectID, key
-		key, err = url.QueryUnescape(parts[2])
-		if err != nil {
-			return []*schema.ResourceData{}, err
-		}
+		key = parts[2]
 	}
 
 	client := meta.(*vercel.Client)

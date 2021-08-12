@@ -2,8 +2,6 @@ package provider
 
 import (
 	"context"
-	"net/url"
-	"strings"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -129,26 +127,19 @@ func resourceDomain() *schema.Resource {
 }
 
 func resourceDomainImportState(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	domainName, err := url.QueryUnescape(d.Id())
+	parts, err := partsFromID(d.Id())
 	if err != nil {
 		return []*schema.ResourceData{}, err
 	}
-	parts := strings.Split(d.Id(), "/")
+	domainName := parts[0]
 	if len(parts) > 1 {
-		teamID, err := url.QueryUnescape(parts[0])
-		if err != nil {
-			return []*schema.ResourceData{}, err
-		}
-
+		teamID := parts[0]
 		err = d.Set("team_id", teamID)
 		if err != nil {
 			return []*schema.ResourceData{}, err
 		}
 
-		domainName, err = url.QueryUnescape(parts[1])
-		if err != nil {
-			return []*schema.ResourceData{}, err
-		}
+		domainName = parts[1]
 	}
 	err = d.Set("name", domainName)
 	if err != nil {
