@@ -91,21 +91,19 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2.3.3
 
+      - name: Get dependencies
+        run: go mod download
 
       - name: Set up terraform
         uses: hashicorp/setup-terraform@v1
         with:
+          terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
-
-      - name: Get dependencies
-        run: |
-          go mod download
 
       - name: TF acceptance tests
         timeout-minutes: 10
         env:
           TF_ACC: "1"
-          TF_ACC_TERRAFORM_VERSION: ${{ matrix.terraform }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
         run: go test -v ./...
