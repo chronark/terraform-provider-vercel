@@ -299,6 +299,8 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 		return diag.FromErr(err)
 	}
 
+	d.SetId(project.ID)
+
 	err = d.Set("name", project.Name)
 	if err != nil {
 		return diag.FromErr(err)
