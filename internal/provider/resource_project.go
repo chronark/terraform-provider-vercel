@@ -187,15 +187,21 @@ func partsFromID(id string) ([]string, error) {
 	return results, nil
 }
 
-func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	parts, err := partsFromID(d.Id())
 	if err != nil {
 		return []*schema.ResourceData{}, err
 	}
 	projectID := parts[0]
 	if len(parts) > 1 {
-		teamID := parts[0]
-		err = d.Set("team_id", teamID)
+		teamSlug := parts[0]
+		client := meta.(*vercel.Client)
+		team, err := client.Team.Read(teamSlug)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		err = d.Set("team_id", team.Id)
 		if err != nil {
 			return []*schema.ResourceData{}, err
 		}

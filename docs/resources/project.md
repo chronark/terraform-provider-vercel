@@ -82,10 +82,12 @@ Project resources can be imported using the project name, e.g:
 $ terraform import vercel_project.app my-project
 ```
 
-For team projects, prefix the project name with the team id followed by a slash (`/`), e.g:
+For team projects, prefix the project name with the team slug followed by a slash (`/`), e.g:
 
 ```
-$ terraform import vercel_project.team_app team_y4tZByVi8ZSPSvHGptjP21Lu/my-project
+$ terraform import vercel_project.team_app my-team/my-project
 ```
 
-Slashes in the project name or team ID may be URL-escaped (percent-encoded) if needed.
+The team slug can be found in the URL for any team screen in Vercel's web interface.
+
+Slashes in the project name or team slug may be URL-escaped (percent-encoded) if needed.
