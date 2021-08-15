@@ -100,7 +100,6 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
 
-
       - name: TF acceptance tests
         timeout-minutes: 10
         env:
