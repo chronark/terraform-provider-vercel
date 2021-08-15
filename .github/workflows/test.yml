@@ -91,6 +91,8 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2.3.3
 
+      - name: Get dependencies
+        run: go mod download
 
       - name: Set up terraform
         uses: hashicorp/setup-terraform@v1
@@ -98,9 +100,6 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
 
-      - name: Get dependencies
-        run: |
-          go mod download
 
       - name: TF acceptance tests
         timeout-minutes: 10
