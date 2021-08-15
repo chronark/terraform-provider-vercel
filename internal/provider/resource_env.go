@@ -176,9 +176,9 @@ func resourceEnvDelete(ctx context.Context, d *schema.ResourceData, meta interfa
 	client := meta.(*vercel.Client)
 
 	projectID := d.Get("project_id").(string)
-	envKey := d.Get("key").(string)
+	envID := d.Get("id").(string)
 
-	err := client.Env.Delete(projectID, envKey, d.Get("team_id").(string))
+	err := client.Env.Delete(projectID, envID, d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}

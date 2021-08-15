@@ -101,8 +101,8 @@ func (h *Handler) Update(projectID string, envID string, env CreateOrUpdateEnv, 
 	defer res.Body.Close()
 	return nil
 }
-func (h *Handler) Delete(projectID, envKey string, teamId string) error {
-	url := fmt.Sprintf("/v4/projects/%s/env/%s", projectID, envKey)
+func (h *Handler) Delete(projectID, envID string, teamId string) error {
+	url := fmt.Sprintf("/v8/projects/%s/env/%s", projectID, envID)
 	if teamId != "" {
 		url = fmt.Sprintf("%s/?teamId=%s", url, teamId)
 	}
