@@ -126,15 +126,22 @@ func resourceDomain() *schema.Resource {
 	}
 }
 
-func resourceDomainImportState(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+func resourceDomainImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	parts, err := partsFromID(d.Id())
 	if err != nil {
 		return []*schema.ResourceData{}, err
 	}
 	domainName := parts[0]
 	if len(parts) > 1 {
-		teamID := parts[0]
-		err = d.Set("team_id", teamID)
+		client := meta.(*vercel.Client)
+
+		teamSlug := parts[0]
+		team, err := client.Team.Read(teamSlug)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		err = d.Set("team_id", team.Id)
 		if err != nil {
 			return []*schema.ResourceData{}, err
 		}

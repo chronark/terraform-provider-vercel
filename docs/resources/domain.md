@@ -55,11 +55,13 @@ Domains can be imported from Vercel using the domain name itself, e.g:
 $ terraform import vercel_domain.domain example.com
 ```
 
-For team domains, prefix the domain name with the team ID followed by a slash (`/`), e.g:
+For team domains, prefix the domain name with the team slug followed by a slash (`/`), e.g:
 
 ```
-$ terraform import vercel_domain.domain team_y4tZByVi8ZSPSvHGptjP21Lu/example.com
+$ terraform import vercel_domain.domain my-team/example.com
 ```
 
-Slashes in the team ID may be URL-escaped (percent-encoded) if needed.
+The team slug can be found in the URL for any team screen in Vercel's web interface.
+
+Slashes in the team slug may be URL-escaped (percent-encoded) if needed.
 
