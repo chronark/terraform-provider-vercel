@@ -90,13 +90,27 @@ func resourceEnvImportState(ctx context.Context, d *schema.ResourceData, meta in
 
 	projectID, key := parts[0], parts[1]
 
+	client := meta.(*vercel.Client)
+
 	teamID := ""
 	if len(parts) > 2 {
-		teamID, projectID = projectID, key
+		var teamSlug string
+		teamSlug, projectID = projectID, key
 		key = parts[2]
+
+		team, err := client.Team.Read(teamSlug)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+		teamID = team.Id
 	}
 
-	client := meta.(*vercel.Client)
+	// Read project ID from project name
+	project, err := client.Project.Read(projectID, teamID)
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	projectID = project.ID
 
 	allEnvVariables, err := client.Env.Read(projectID, teamID)
 	if err != nil {

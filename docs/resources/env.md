@@ -49,17 +49,19 @@ resource "vercel_env" "my_env" {
 
 ## Importing
 
-Use the project ID and the variable name separated by a slash (`/`), e.g:
+Use the project and variable names separated by a slash (`/`), e.g:
 
 ```
-$ terraform import vercel_env.env prj_1HbXTXCm5efoGQwtIdAjycJETmo7/THE_VARIABLE
+$ terraform import vercel_env.env my-project/THE_VARIABLE
 ```
 
-For team projects, include the team ID as a prefix, e.g:
+For team projects, include the team slug as a prefix, e.g:
 
 ```
-$ terraform import vercel_project.team_app team_y4tZByVi8ZSPSvHGptjP21Lu/prj_1HbXTXCm5efoGQwtIdAjycJETmo7/THE_VARIABLE
+$ terraform import vercel_project.team_app my-team/my-project/THE_VARIABLE
 ```
 
-Slashes in the project or team IDs may be URL-escaped (percent-encoded) if needed.
+The team slug can be found in the URL for any team screen in Vercel's web interface.
+
+Slashes in the project name or team slug may be URL-escaped (percent-encoded) if needed.
 
