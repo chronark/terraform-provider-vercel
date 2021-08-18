@@ -1,4 +1,4 @@
-package utility
+package util
 
 // Difference returns a slice containing all of the elements of 'a' that aren't present in 'b'.
 //

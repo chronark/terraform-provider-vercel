@@ -3,8 +3,8 @@ package provider
 import (
 	"context"
 
+	"github.com/chronark/terraform-provider-vercel/pkg/util"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
-	"github.com/chronark/terraform-provider-vercel/internal/utility"
 	projectApi "github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -383,8 +383,8 @@ func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta int
 		  oldDomains = append(oldDomains, d.(map[string]interface{})["name"].(string))
 	  }
 
-	  toAdd := utility.Difference(newDomains, oldDomains)
-	  toRemove := utility.Difference(oldDomains, newDomains)
+	  toAdd := util.Difference(newDomains, oldDomains)
+	  toRemove := util.Difference(oldDomains, newDomains)
 
 	  for _, dom := range toAdd {
 	  	err := client.Project.AddDomain(d.Id(), projectApi.Domain{Name: dom}, d.Get("team_id").(string))
