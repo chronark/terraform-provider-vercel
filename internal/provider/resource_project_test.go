@@ -11,6 +11,12 @@ import (
 	"testing"
 )
 
+// The domain to add to the project. The TLD should be authorized in your test Vercel account.
+const domainAlias = "domain-alias.chronark.com"
+
+// The repository to test project creation with. Your Vercel account should have access to this.
+const repository = "chronark/terraform-provider-vercel"
+
 func TestAccVercelProject(t *testing.T) {
 
 	projectName, _ := uuid.GenerateUUID()
@@ -50,6 +56,14 @@ func TestAccVercelProject(t *testing.T) {
 					),
 					testAccCheckActualProjectHasValues(&actualProjectAfterUpdate, &project.Project{Name: updatedProjectName}),
 					testAccCheckProjectWasNotRecreated(&actualProjectAfterCreation, &actualProjectAfterUpdate),
+				),
+			},
+			{
+				Config: testAccCheckVercelProjectConfigWithDomain(updatedProjectName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVercelProjectExists("vercel_project.new", &actualProjectAfterUpdate),
+					testAccCheckProjectStateHasDomain("vercel_project.new"),
+					testAccCheckActualProjectHasDomain(&actualProjectAfterUpdate),
 				),
 			},
 			{
@@ -104,6 +118,21 @@ func testAccCheckProjectStateHasValues(name string, want project.Project) resour
 	}
 }
 
+func testAccCheckProjectStateHasDomain(n string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs := s.RootModule().Resources[n]
+
+		actual := rs.Primary.Attributes["alias.1"]
+		want := domainAlias
+
+		if actual != want {
+			return fmt.Errorf("domain alias does not match, expected: %s, got: %s", want, actual)
+		}
+
+		return nil
+	}
+}
+
 // Chaning the name or value of a project should not result in a recreation meaning the UID assigned by vercel
 // should not have changed.
 func testAccCheckProjectWasNotRecreated(s1, s2 *project.Project) resource.TestCheckFunc {
@@ -141,6 +170,18 @@ func testAccCheckActualProjectHasValues(actual *project.Project, want *project.P
 	}
 }
 
+func testAccCheckActualProjectHasDomain(actual *project.Project) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		want := domainAlias
+
+		if actual.Alias[1].Domain != want {
+			return fmt.Errorf("name does not match, expected: %s, got: %s", want, actual.Alias[1].Domain)
+		}
+
+		return nil
+	}
+}
+
 // Test whether the project was destroyed properly and finishes the job if necessary
 func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
@@ -166,16 +207,35 @@ func testAccCheckVercelProjectDestroy(name string) resource.TestCheckFunc {
 	}
 
 }
+
 func testAccCheckVercelProjectConfig(name string) string {
 	return fmt.Sprintf(`
 	resource "vercel_project" "new" {
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "chronark/terraform-provider-vercel"
+			repo = "%s"
 		}
 	}
-	`, name)
+	`, name, repository)
+}
+
+func testAccCheckVercelProjectConfigWithDomain(name string) string {
+	return fmt.Sprintf(`
+	resource "vercel_project" "new" {
+		name = "%s"
+
+		git_repository {
+			type = "github"
+			repo = "%s"
+		}
+
+		domain {
+	    git_branch = "main"
+	    name       = "%s"
+	  }
+	}
+	`, name, repository, domainAlias)
 }
 
 func testAccCheckVercelProjectConfigWithOverridenCommands(name string) string {
@@ -184,14 +244,14 @@ func testAccCheckVercelProjectConfigWithOverridenCommands(name string) string {
 		name = "%s"
 		git_repository {
 			type = "github"
-			repo = "chronark/terraform-provider-vercel"
+			repo = "%s"
 		}
 		install_command  = "echo install"
 		build_command 	 = "echo build"
 		dev_command 	 = "echo dev"
 		output_directory = "out"
 	}
-	`, name)
+	`, name, repository)
 }
 
 func testAccCheckVercelProjectExists(n string, actual *project.Project) resource.TestCheckFunc {
