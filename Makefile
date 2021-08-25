@@ -3,8 +3,7 @@ default: testacc
 # Run acceptance tests
 .PHONY: testacc
 testacc:
-	@go get github.com/mfridman/tparse
-	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m  -race -covermode=atomic  -json | tparse -all -dump
+	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 2m  -race -covermode=atomic  
 
 test:
 	go test ./... -v
