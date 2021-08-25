@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/chronark/terraform-provider-vercel/pkg/util"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	projectApi "github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -363,6 +364,41 @@ func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta int
 	err := client.Project.Update(d.Id(), update, d.Get("team_id").(string))
 	if err != nil {
 		return diag.FromErr(err)
+	}
+
+
+	if d.HasChange("domain") {
+  	rawOldDomains, rawNewDomains := d.GetChange("domain")
+
+	  var (
+		  oldDomains []string
+		  newDomains []string
+	  )
+
+	  for _, d := range rawNewDomains.([]interface{}) {
+		  newDomains = append(newDomains, d.(map[string]interface{})["name"].(string))
+	  }
+
+	  for _, d := range rawOldDomains.([]interface{}) {
+		  oldDomains = append(oldDomains, d.(map[string]interface{})["name"].(string))
+	  }
+
+	  toAdd := util.Difference(newDomains, oldDomains)
+	  toRemove := util.Difference(oldDomains, newDomains)
+
+	  for _, dom := range toAdd {
+	  	err := client.Project.AddDomain(d.Id(), projectApi.Domain{Name: dom}, d.Get("team_id").(string))
+			if err != nil {
+				return diag.FromErr(err)
+			}
+	  }
+
+	  for _, dom := range toRemove {
+	  	err := client.Project.RemoveDomain(d.Id(), dom, d.Get("team_id").(string))
+			if err != nil {
+				return diag.FromErr(err)
+			}
+	  }
 	}
 
 	return resourceProjectRead(ctx, d, meta)
