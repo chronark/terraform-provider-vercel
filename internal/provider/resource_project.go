@@ -69,8 +69,6 @@ func resourceProject() *schema.Resource {
 				Description: "Add a domain to the project by passing the project.",
 				Optional:    true,
 				Type:        schema.TypeList,
-				MaxItems:    1,
-
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
@@ -435,39 +433,38 @@ func resourceProjectUpdate(ctx context.Context, d *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 
-
 	if d.HasChange("domain") {
-  	rawOldDomains, rawNewDomains := d.GetChange("domain")
+		rawOldDomains, rawNewDomains := d.GetChange("domain")
 
-	  var (
-		  oldDomains []string
-		  newDomains []string
-	  )
+		var (
+			oldDomains []string
+			newDomains []string
+		)
 
-	  for _, d := range rawNewDomains.([]interface{}) {
-		  newDomains = append(newDomains, d.(map[string]interface{})["name"].(string))
-	  }
+		for _, d := range rawNewDomains.([]interface{}) {
+			newDomains = append(newDomains, d.(map[string]interface{})["name"].(string))
+		}
 
-	  for _, d := range rawOldDomains.([]interface{}) {
-		  oldDomains = append(oldDomains, d.(map[string]interface{})["name"].(string))
-	  }
+		for _, d := range rawOldDomains.([]interface{}) {
+			oldDomains = append(oldDomains, d.(map[string]interface{})["name"].(string))
+		}
 
-	  toAdd := util.Difference(newDomains, oldDomains)
-	  toRemove := util.Difference(oldDomains, newDomains)
+		toAdd := util.Difference(newDomains, oldDomains)
+		toRemove := util.Difference(oldDomains, newDomains)
 
-	  for _, dom := range toAdd {
-	  	err := client.Project.AddDomain(d.Id(), projectApi.Domain{Name: dom}, d.Get("team_id").(string))
+		for _, dom := range toAdd {
+			err := client.Project.AddDomain(d.Id(), projectApi.Domain{Name: dom}, d.Get("team_id").(string))
 			if err != nil {
 				return diag.FromErr(err)
 			}
-	  }
+		}
 
-	  for _, dom := range toRemove {
-	  	err := client.Project.RemoveDomain(d.Id(), dom, d.Get("team_id").(string))
+		for _, dom := range toRemove {
+			err := client.Project.RemoveDomain(d.Id(), dom, d.Get("team_id").(string))
 			if err != nil {
 				return diag.FromErr(err)
 			}
-	  }
+		}
 	}
 
 	return resourceProjectRead(ctx, d, meta)

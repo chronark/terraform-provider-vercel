@@ -7,9 +7,9 @@ import (
 
 func TestDifference(t *testing.T) {
 	tests := []struct {
-		input1    []string
-		input2    []string
-		expected  []string
+		input1   []string
+		input2   []string
+		expected []string
 	}{
 		{[]string{"a", "b", "c"}, []string{"a", "b", "d"}, []string{"c"}},
 		{[]string{"a", "b", "d"}, []string{"a", "b", "c"}, []string{"d"}},

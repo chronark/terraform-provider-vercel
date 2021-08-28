@@ -16,11 +16,14 @@ resource "vercel_project" "my_project" {
   name = "test"
   git_repository {
     type = "github"
-    repo = "chronark/mercury"
+    repo = "chronark/terraform-provider-vercel"
   }
 
   domain {
-    name = "chronark.com"
+    name = "one.chronark.com"
+  }
+  domain {
+    name = "two.chronark.com"
   }
 
 
