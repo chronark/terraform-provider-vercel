@@ -1,14 +1,16 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"testing"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"os"
-	"testing"
 )
 
 // The domain to add to the project. The TLD should be authorized in your test Vercel account.
@@ -87,6 +89,32 @@ func TestAccVercelProject(t *testing.T) {
 						OutputDirectory: "out",
 					},
 					),
+				),
+			},
+		},
+	})
+}
+
+func TestAccVercelProject_import(t *testing.T) {
+
+	projectName, _ := uuid.GenerateUUID()
+	var (
+		// Used everywhere else
+		actualProject project.Project
+	)
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckVercelProjectDestroy(projectName),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckVercelProjectConfig(projectName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckProjectStateHasValues(
+						"vercel_project.new", project.Project{Name: projectName},
+					),
+					testAccCheckVercelProjectExists("vercel_project.new", &actualProject),
+					testAccVercelProjectImport(&actualProject),
 				),
 			},
 		},
@@ -271,6 +299,25 @@ func testAccCheckVercelProjectExists(n string, actual *project.Project) resource
 			return err
 		}
 		*actual = project
+		return nil
+	}
+}
+
+func testAccVercelProjectImport(source *project.Project) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		data := resourceProject().Data(nil)
+		data.SetId(source.Name)
+		ds, err := resourceProject().Importer.StateContext(context.Background(), data, vercel.New(os.Getenv("VERCEL_TOKEN")))
+		if err != nil {
+			return err
+		}
+		if len(ds) != 1 {
+			return fmt.Errorf("Expected 1 instance state from importer function. Got %d", len(ds))
+		}
+
+		if ds[0].Id() != source.Name {
+			return fmt.Errorf("Imported project ID. Expected '%s'. Actual '%s'.", source.Name, ds[0].Id())
+		}
 		return nil
 	}
 }
