@@ -47,3 +47,21 @@ resource "vercel_domain" "google-com" {
 - **verified** (Boolean) If the domain has the ownership verified.
 
 
+## Importing
+
+Domains can be imported from Vercel using the domain name itself, e.g:
+
+```
+$ terraform import vercel_domain.domain example.com
+```
+
+For team domains, prefix the domain name with the team slug followed by a slash (`/`), e.g:
+
+```
+$ terraform import vercel_domain.domain my-team/example.com
+```
+
+The team slug can be found in the URL for any team screen in Vercel's web interface.
+
+Slashes in the team slug may be URL-escaped (percent-encoded) if needed.
+

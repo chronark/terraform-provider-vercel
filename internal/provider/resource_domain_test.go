@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -47,6 +48,31 @@ func TestAccVercelDomain(t *testing.T) {
 					),
 					testAccCheckActualDomainHasValues(&actualDomainAfterUpdate, &domain.Domain{Name: updatedDomainName}),
 					testAccCheckDomainWasRecreated(&actualDomainAfterCreation, &actualDomainAfterUpdate),
+				),
+			},
+		},
+	})
+}
+
+func TestAccVercelDomain_import(t *testing.T) {
+
+	domainName := "acceptancetestdomainone.com"
+	var (
+		actualDomain domain.Domain
+	)
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckVercelDomainDestroy(domainName),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckVercelDomainConfig(domainName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDomainStateHasValues(
+						"vercel_domain.new", domain.Domain{Name: domainName},
+					),
+					testAccCheckVercelDomainExists("vercel_domain.new", &actualDomain),
+					testAccVercelDomainImport(&actualDomain),
 				),
 			},
 		},
@@ -144,6 +170,25 @@ func testAccCheckVercelDomainExists(n string, actual *domain.Domain) resource.Te
 			return err
 		}
 		*actual = domain
+		return nil
+	}
+}
+
+func testAccVercelDomainImport(source *domain.Domain) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		data := resourceDomain().Data(nil)
+		data.SetId(source.Name)
+		ds, err := resourceDomain().Importer.StateContext(context.Background(), data, vercel.New(os.Getenv("VERCEL_TOKEN")))
+		if err != nil {
+			return err
+		}
+		if len(ds) != 1 {
+			return fmt.Errorf("Expected 1 instance state from importer function. Got %d", len(ds))
+		}
+
+		if ds[0].Get("name") != source.Name {
+			return fmt.Errorf("Imported domain name. Expected '%s'. Actual '%s'.", source.Name, ds[0].Get("name").(string))
+		}
 		return nil
 	}
 }

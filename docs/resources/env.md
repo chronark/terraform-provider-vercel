@@ -47,4 +47,21 @@ resource "vercel_env" "my_env" {
 - **id** (String) Unique id for this variable.
 - **updated_at** (Number) A number containing the date when the variable was updated in milliseconds.
 
+## Importing
+
+Use the project and variable names separated by a slash (`/`), e.g:
+
+```
+$ terraform import vercel_env.env my-project/THE_VARIABLE
+```
+
+For team projects, include the team slug as a prefix, e.g:
+
+```
+$ terraform import vercel_project.team_app my-team/my-project/THE_VARIABLE
+```
+
+The team slug can be found in the URL for any team screen in Vercel's web interface.
+
+Slashes in the project name or team slug may be URL-escaped (percent-encoded) if needed.
 

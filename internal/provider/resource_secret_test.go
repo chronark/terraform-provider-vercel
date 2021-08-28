@@ -1,14 +1,16 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"testing"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/secret"
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"os"
-	"testing"
 )
 
 func TestAccVercelSecret(t *testing.T) {
@@ -48,6 +50,30 @@ func TestAccVercelSecret(t *testing.T) {
 					),
 					testAccCheckActualSecretHasValues(&actualSecretAfterUpdate, &secret.Secret{Name: secretName}),
 					testAccCheckSecretWasRecreated(&actualSecretAfterCreation, &actualSecretAfterUpdate),
+				),
+			},
+		},
+	})
+}
+
+func TestAccVercelSecret_import(t *testing.T) {
+
+	secretName, _ := uuid.GenerateUUID()
+	secretValue, _ := uuid.GenerateUUID()
+	var (
+		// Holds the secret fetched from vercel when we create it at the beginning
+		actualSecretAfterCreation secret.Secret
+	)
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckVercelSecretDestroy(secretName),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckVercelSecretConfig(secretName, secretValue),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVercelSecretExists("vercel_secret.new", &actualSecretAfterCreation),
+					testAccVercelSecretImport(&actualSecretAfterCreation),
 				),
 			},
 		},
@@ -149,6 +175,25 @@ func testAccCheckVercelSecretExists(n string, actual *secret.Secret) resource.Te
 			return err
 		}
 		*actual = secret
+		return nil
+	}
+}
+
+func testAccVercelSecretImport(source *secret.Secret) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		data := resourceSecret().Data(nil)
+		data.SetId(source.UID)
+		ds, err := resourceSecret().Importer.StateContext(context.Background(), data, nil)
+		if err != nil {
+			return err
+		}
+		if len(ds) != 1 {
+			return fmt.Errorf("Expected 1 instance state from importer function. Got %d", len(ds))
+		}
+
+		if ds[0].Id() != source.UID {
+			return fmt.Errorf("Imported secret ID. Expected '%s'. Actual '%s'.", source.UID, ds[0].Id())
+		}
 		return nil
 	}
 }
