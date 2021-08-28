@@ -47,4 +47,13 @@ resource "vercel_env" "env" {
 - **id** (String) The unique identifier of the secret.
 - **user_id** (String) The unique identifier of the user who created the secret.
 
+## Importing
 
+Use the Vercel secret ID:
+
+```
+$ terraform import vercel_secret.thesecret sec_CTjwzonA7MCjQnDDP0yQbDc8
+```
+
+Please note that after secrets are written, Vercel does not allow reading the value.
+Subsequent operations may overwrite or replace the resource because of that.

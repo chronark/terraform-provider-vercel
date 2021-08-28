@@ -16,6 +16,10 @@ func resourceDomain() *schema.Resource {
 		ReadContext:   resourceDomainRead,
 		DeleteContext: resourceDomainDelete,
 
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceDomainImportState,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"team_id": {
 				Description: "By default, you can access resources contained within your own user account. To access resources owned by a team, you can pass in the team ID",
@@ -120,6 +124,35 @@ func resourceDomain() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceDomainImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts, err := partsFromID(d.Id())
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	domainName := parts[0]
+	if len(parts) > 1 {
+		client := meta.(*vercel.Client)
+
+		teamSlug := parts[0]
+		team, err := client.Team.Read(teamSlug)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		err = d.Set("team_id", team.Id)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		domainName = parts[1]
+	}
+	err = d.Set("name", domainName)
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceDomainCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {

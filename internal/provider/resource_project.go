@@ -2,6 +2,9 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/chronark/terraform-provider-vercel/pkg/util"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
@@ -18,6 +21,10 @@ func resourceProject() *schema.Resource {
 		ReadContext:   resourceProjectRead,
 		UpdateContext: resourceProjectUpdate,
 		DeleteContext: resourceProjectDelete,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceProjectImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -163,6 +170,46 @@ func resourceProject() *schema.Resource {
 	}
 }
 
+func partsFromID(id string) ([]string, error) {
+	parts := strings.Split(id, "/")
+	results := make([]string, len(parts))
+	for i, part := range parts {
+		result, err := url.QueryUnescape(part)
+		if err != nil {
+			return results, err
+		}
+
+		results[i] = result
+	}
+
+	return results, nil
+}
+
+func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts, err := partsFromID(d.Id())
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	projectID := parts[0]
+	if len(parts) > 1 {
+		teamSlug := parts[0]
+		client := meta.(*vercel.Client)
+		team, err := client.Team.Read(teamSlug)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		err = d.Set("team_id", team.Id)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+
+		projectID = parts[1]
+	}
+	d.SetId(projectID)
+	return []*schema.ResourceData{d}, nil
+}
+
 func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	client := meta.(*vercel.Client)
@@ -256,6 +303,8 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 		return diag.FromErr(err)
 	}
 
+	d.SetId(project.ID)
+
 	err = d.Set("name", project.Name)
 	if err != nil {
 		return diag.FromErr(err)
@@ -316,6 +365,26 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 		aliases = append(aliases, project.Alias[i].Domain)
 	}
 	err = d.Set("alias", aliases)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	gitRepository := make([]map[string]interface{}, 1)
+	gitRepository[0] = map[string]interface{}{
+		"type": project.Link.Type,
+	}
+	switch project.Link.Type {
+	case "gitlab":
+		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.ProjectNamespace, project.Link.ProjectName)
+	case "github":
+		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.Org, project.Link.Repo)
+	case "bitbucket":
+		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.Owner, project.Link.Slug)
+	default:
+		return diag.Errorf("Can't recognize '%s' repository type", project.Link.Type)
+	}
+
+	err = d.Set("git_repository", gitRepository)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -2,6 +2,8 @@ package provider
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/env"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -16,6 +18,10 @@ func resourceEnv() *schema.Resource {
 		ReadContext:   resourceEnvRead,
 		UpdateContext: resourceEnvUpdate,
 		DeleteContext: resourceEnvDelete,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceEnvImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project_id": {
@@ -71,6 +77,59 @@ func resourceEnv() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceEnvImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts, err := partsFromID(d.Id())
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	if len(parts) < 2 {
+		return []*schema.ResourceData{}, fmt.Errorf("Invalid import ID (use project_id/VARIABLE_NAME")
+	}
+
+	projectID, key := parts[0], parts[1]
+
+	client := meta.(*vercel.Client)
+
+	teamID := ""
+	if len(parts) > 2 {
+		var teamSlug string
+		teamSlug, projectID = projectID, key
+		key = parts[2]
+
+		team, err := client.Team.Read(teamSlug)
+		if err != nil {
+			return []*schema.ResourceData{}, err
+		}
+		teamID = team.Id
+	}
+
+	// Read project ID from project name
+	project, err := client.Project.Read(projectID, teamID)
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+	projectID = project.ID
+
+	allEnvVariables, err := client.Env.Read(projectID, teamID)
+	if err != nil {
+		return []*schema.ResourceData{}, err
+	}
+
+	// Filter the current variable out of all existing ones
+	for _, envVar := range allEnvVariables {
+		if envVar.Key == key {
+			d.SetId(envVar.ID)
+			err = d.Set("project_id", projectID)
+			if err != nil {
+				return []*schema.ResourceData{}, err
+			}
+			return []*schema.ResourceData{d}, nil
+		}
+	}
+
+	return []*schema.ResourceData{d}, fmt.Errorf("No '%s' environment variable in project", key)
 }
 
 func toCreateOrUpdateEnv(d *schema.ResourceData) env.CreateOrUpdateEnv {

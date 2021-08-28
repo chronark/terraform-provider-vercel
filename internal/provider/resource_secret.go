@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/secret"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -15,6 +16,10 @@ func resourceSecret() *schema.Resource {
 		CreateContext: resourceSecretCreate,
 		ReadContext:   resourceSecretRead,
 		DeleteContext: resourceSecretDelete,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"id": {
