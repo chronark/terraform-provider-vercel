@@ -17,7 +17,7 @@ resource "vercel_project" "my_project" {
   name = "mercury"
   git_repository {
     type = "github"
-    repo = "chronark/mercury"
+    repo = "chronark/terraform-provider-vercel"
   }
 }
 ```
@@ -35,7 +35,7 @@ resource "vercel_project" "my_project" {
 - **alias** (List of String) A list of production domains for the project.
 - **build_command** (String) The build command for this project. When null is used this value will be automatically detected.
 - **dev_command** (String) The dev command for this project. When null is used this value will be automatically detected.
-- **domain** (Block List, Max: 1) Add a domain to the project by passing the project. (see [below for nested schema](#nestedblock--domain))
+- **domain** (Block List) Add a domain to the project by passing the project. (see [below for nested schema](#nestedblock--domain))
 - **framework** (String) The framework that is being used for this project. When null is used no framework is selected.
 - **install_command** (String) The install command for this project. When null is used this value will be automatically detected.
 - **node_version** (String) The Node.js Version for this project.

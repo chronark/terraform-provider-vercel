@@ -45,7 +45,7 @@ resource "vercel_project" "my_project" {
   name = "mercury-via-terraform"
   git_repository {
     type = "github"
-    repo = "chronark/mercury"
+    repo = "chronark/terraform-provider-vercel"
   }
 }
 ```
