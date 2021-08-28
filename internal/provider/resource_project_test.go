@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/chronark/terraform-provider-vercel/pkg/util"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel"
 	"github.com/chronark/terraform-provider-vercel/pkg/vercel/project"
 	"github.com/hashicorp/go-uuid"
@@ -13,11 +14,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-// The domain to add to the project. The TLD should be authorized in your test Vercel account.
-const domainAlias = "domain-alias.chronark.com"
+var (
+	// The domain to add to the project. The TLD should be authorized in your test Vercel account.
+	domainAlias = util.GetEnv("DOMAIN_ALIAS", "domain-alias.chronark.com")
 
-// The repository to test project creation with. Your Vercel account should have access to this.
-const repository = "chronark/terraform-provider-vercel"
+	// The repository to test project creation with. Your Vercel account should have access to this.
+	repository = util.GetEnv("REPOSITORY", "chronark/terraform-provider-vercel")
+)
 
 func TestAccVercelProject(t *testing.T) {
 
