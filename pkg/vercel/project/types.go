@@ -186,7 +186,7 @@ type Project struct {
 // CreateProject has all the fields the user can set when creating a new project
 type CreateProject struct {
 	Name          string `json:"name"`
-	GitRepository struct {
+	GitRepository *struct {
 		Type string `json:"type"`
 		Repo string `json:"repo"`
 	} `json:"gitRepository,omitempty"`

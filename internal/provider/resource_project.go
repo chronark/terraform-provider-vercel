@@ -46,7 +46,7 @@ func resourceProject() *schema.Resource {
 			},
 			"git_repository": {
 				Description: "The git repository that will be connected to the project. Any pushes to the specified connected git repository will be automatically deployed.",
-				Required:    true,
+				Optional:    true,
 				ForceNew:    true,
 				Type:        schema.TypeList,
 				MaxItems:    1,
@@ -213,18 +213,27 @@ func resourceProjectImportState(ctx context.Context, d *schema.ResourceData, met
 func resourceProjectCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	client := meta.(*vercel.Client)
-	// Terraform does not have nested objects with different types yet, so I am using a `TypeList`
-	// Here we have to typecast to list first and then take the first item and cast again.
-	repo := d.Get("git_repository").([]interface{})[0].(map[string]interface{})
-	project := projectApi.CreateProject{
-		Name: d.Get("name").(string),
-		GitRepository: struct {
-			Type string `json:"type"`
-			Repo string `json:"repo"`
-		}{
-			Type: repo["type"].(string),
-			Repo: repo["repo"].(string),
-		},
+
+	var project projectApi.CreateProject
+	_, repoSet := d.GetOk("git_repository")
+	if repoSet {
+		// Terraform does not have nested objects with different types yet, so I am using a `TypeList`
+		// Here we have to typecast to list first and then take the first item and cast again.
+		repo := d.Get("git_repository").([]interface{})[0].(map[string]interface{})
+		project = projectApi.CreateProject{
+			Name: d.Get("name").(string),
+			GitRepository: &struct {
+				Type string `json:"type"`
+				Repo string `json:"repo"`
+			}{
+				Type: repo["type"].(string),
+				Repo: repo["repo"].(string),
+			},
+		}
+	} else {
+		project = projectApi.CreateProject{
+			Name: d.Get("name").(string),
+		}
 	}
 
 	framework, frameworkSet := d.GetOk("framework")
@@ -381,7 +390,7 @@ func resourceProjectRead(ctx context.Context, d *schema.ResourceData, meta inter
 	case "bitbucket":
 		gitRepository[0]["repo"] = fmt.Sprintf("%s/%s", project.Link.Owner, project.Link.Slug)
 	default:
-		return diag.Errorf("Can't recognize '%s' repository type", project.Link.Type)
+		return diag.Diagnostics{}
 	}
 
 	err = d.Set("git_repository", gitRepository)
