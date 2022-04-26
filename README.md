@@ -3,6 +3,11 @@
     <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" alt="Terraform logo" title="Terraform" height="50" align="right"></img>
 </a>
 
+
+
+# DEPRECATED, please use the [official provider by vercel](https://github.com/vercel/terraform-provider-vercel)
+
+
 # Terraform Provider for Vercel
 
 Configure vercel resources such as projects, deployments and secrets as code with terraform.
