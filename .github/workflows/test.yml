@@ -78,7 +78,7 @@ jobs:
         run: go mod download
 
       - name: Set up terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
